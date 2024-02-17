@@ -8,4 +8,5 @@ public interface IUserRepository {
     void followSeller(int userId, int userIdToFollow);
     void unfollowSeller(int userId, int userIdToFollow);
     Optional<User> getUserById(int userId);
+    Optional<User> getFollowedUserById(int userId);
 }
