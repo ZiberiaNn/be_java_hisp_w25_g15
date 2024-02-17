@@ -4,6 +4,8 @@ import com.mercadolibre.be_java_hisp_w25_g15.dto.response.CountFollowersDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.MessageResponseDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.UserDto;
 
+import java.util.List;
+
 public interface IUserService {
     MessageResponseDto unfollowSeller(int userId, int userIdToUnfollow);
 
@@ -12,4 +14,6 @@ public interface IUserService {
     CountFollowersDto countFollowersByUserId(int userId);
 
     UserDto findAllFollwedByUser(int userId);
+
+    List<UserDto> findAll();
 }

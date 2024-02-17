@@ -42,7 +42,12 @@ public class UserRepository implements IUserRepository {
     }
 
     @Override
-    public Optional<User> getFollowedUserById(int userId) {
-        return this.users.stream().filter(user -> user.getId() == userId).filter(user->!user.getFollowed().isEmpty()).findFirst();
+    public User getFollowedUserById(int userId) {
+        return this.users.stream().filter(user->user.getId()==userId && !user.getFollowed().isEmpty()).findFirst().orElse(null);
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return this.users;
     }
 }
