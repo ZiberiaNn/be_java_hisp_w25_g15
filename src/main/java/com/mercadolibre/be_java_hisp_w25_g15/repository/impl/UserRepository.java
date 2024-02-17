@@ -40,4 +40,9 @@ public class UserRepository implements IUserRepository {
     public Optional<User> getUserById(int userId) {
         return this.users.stream().filter(user -> user.getId() == userId).findFirst();
     }
+
+    @Override
+    public Optional<User> getFollowedUserById(int userId) {
+        return this.users.stream().filter(user -> user.getId() == userId).filter(user->!user.getFollowed().isEmpty()).findFirst();
+    }
 }
