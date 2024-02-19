@@ -14,9 +14,9 @@ public interface IUserService {
 
     CountFollowersDto countFollowersByUserId(int userId);
 
-    UserDto findAllFollwedByUser(int userId);
+    UserDto findAllFollowedByUser(int userId, String order);
 
-    UserDto findAllSellerFollowers(int sellerId);
+    UserDto findAllSellerFollowers(int sellerId, String order);
 
     List<UserDto> findAll();
 }
