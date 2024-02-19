@@ -24,7 +24,6 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService {
-    private final ObjectMapperBean objectMapper;
     private final IUserRepository userRepository;
 
     @Override
@@ -46,8 +45,8 @@ public class UserService implements IUserService {
 
         buyer.get().getFollowed().removeIf(followed -> followed.getId() == seller.get().getId());
         ((Seller) seller.get()).getFollowers().removeIf(follower -> follower.getId() == buyer.get().getId());
-        userRepository.unfollowSeller(buyer.get(), seller.get());
-
+        userRepository.updateFollowedList(buyer.get());
+        userRepository.updateFollowerList(seller.get());
         return new MessageResponseDto("User unfollowed successfully");
     }
 
@@ -70,7 +69,13 @@ public class UserService implements IUserService {
                 .findFirst();
         if(resultSearchUserInFollowersOfSeller.isPresent())
             throw new ConflictException("User already is following");
-        this.userRepository.followSeller(userId, userIdToFollow);
+
+        user.get().getFollowed().add(userToFollow.get());
+        ((Seller) userToFollow.get()).getFollowers().add(user.get());
+
+        this.userRepository.updateFollowerList(userToFollow.get());
+        this.userRepository.updateFollowedList(user.get());
+
         return new MessageResponseDto("Seller followed correctly");
     }
 
@@ -102,7 +107,8 @@ public class UserService implements IUserService {
         } else if (((Seller) user).getFollowers().isEmpty()) {
             throw new NotFoundException("Seller has no followers");
         } else {
-            return new UserDto( user.getId(), user.getUsername(), parseUsersToUserListDto(((Seller) user).getFollowers(), order), null);
+            List<UserListDto> userListDtos = createUserListDto(((Seller) user).getFollowers());
+            return new UserDto( user.getId(), user.getUsername(), sortUserListDto(userListDtos, order) , null);
         }
     }
 
@@ -117,12 +123,12 @@ public class UserService implements IUserService {
             throw new NotFoundException("User has not followed");
         }else{
             // Se encapsula en un objeto DTO con atributos DTO
-            return new UserDto( user.get().getId(), user.get().getUsername(), null, parseUsersToUserListDto(user.get().getFollowed(), order));
+            return new UserDto( user.get().getId(), user.get().getUsername(), null, createUserListDto(user.get().getFollowed()));
         }
     }
 
     @Override
-    public List<UserDto> findAll() {
+    public List<UserListDto> findAll() {
         if(userRepository.getAllUsers().isEmpty()){
             throw new NotFoundException("Usuarios no registrados");
         }
@@ -130,23 +136,29 @@ public class UserService implements IUserService {
     }
 
     // Método para convertir una lista Entidad tipo User a una lista Dto tipo SellerDto
-    private List<UserListDto> parseUsersToUserListDto(List<User> users , String order){
-        Stream<UserListDto> userListDtoStream = users.stream()
-                .map(user -> new UserListDto(user.getId(),user.getUsername()));
+    private List<UserListDto> createUserListDto(List<User> users){
+        return users.stream()
+                .map(user -> new UserListDto(user.getId(),user.getUsername()))
+                .toList();
+    }
+
+    private List<UserListDto> sortUserListDto(List<UserListDto> userListDtos, String order){
         if (order != null) {
-            if (order.equals("name_asc")) {
-                userListDtoStream = userListDtoStream.sorted(Comparator.comparing(UserListDto::getUsername));
-            } else if (order.equals("name_desc")) {
-                userListDtoStream = userListDtoStream.sorted(Comparator.comparing(UserListDto::getUsername).reversed());
+            if (order.equals("name_asc") && userListDtos.size() > 1) {
+                // sort by name asc
+                userListDtos = userListDtos.stream().sorted(Comparator.comparing(UserListDto::getUsername)).collect(Collectors.toList());
+            } else if (order.equals("name_desc") && userListDtos.size() > 1) {
+                // sort by name desc
+                userListDtos = userListDtos.stream().sorted(Comparator.comparing(UserListDto::getUsername).reversed()).collect(Collectors.toList());
             }
         }
-        return userListDtoStream.toList();
+        return userListDtos;
     }
 
     // Método para convertir una lista Entidad tipo User a una lista Dto tipo UserDto
-    private List<UserDto> parseUsersDto(List<User> users){
-        return users.stream().map(users_->objectMapper.getMapper().convertValue(users_,UserDto.class))
-                .collect(Collectors.toList());
+    private List<UserListDto> parseUsersDto(List<User> users){
+        return users.stream().map(u -> new UserListDto(u.getId(), u.getUsername()))
+                .toList();
     }
 
 }

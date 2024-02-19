@@ -4,6 +4,7 @@ import com.mercadolibre.be_java_hisp_w25_g15.dto.request.UnfollowDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.CountFollowersDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.MessageResponseDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.UserDto;
+import com.mercadolibre.be_java_hisp_w25_g15.dto.response.UserListDto;
 import com.mercadolibre.be_java_hisp_w25_g15.service.IUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,16 +50,16 @@ public class UserController {
     }
 
     @GetMapping("/get-users")
-    public ResponseEntity<List<UserDto>> getAllUsers() {
+    public ResponseEntity<List<UserListDto>> getAllUsers() {
         return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
     }
 
-    @GetMapping("/users/{userId}/followed/list")
+    @GetMapping("/{userId}/followed/list")
     public ResponseEntity<UserDto> getAllFollowedByUser(@PathVariable int userId, @RequestParam(name = "order", required = false) String order) {
         return new ResponseEntity<>(userService.findAllFollowedByUser(userId, order), HttpStatus.OK);
     }
 
-    @GetMapping("/users/{userId}/followers/list")
+    @GetMapping("/{userId}/followers/list")
     public ResponseEntity<UserDto> getAllFollowersByUser(@PathVariable int userId, @RequestParam(name = "order", required = false) String order) {
         return new ResponseEntity<>(userService.findAllSellerFollowers(userId, order), HttpStatus.OK);
     }

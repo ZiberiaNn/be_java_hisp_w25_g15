@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IUserRepository {
-    void followSeller(int userId, int userIdToFollow);
-    void unfollowSeller(User burt, User seller);
+    void updateFollowedList(User user);
+    void updateFollowerList(User user);
     Optional<User> getUserById(int userId);
     List<User> getAllUsers();
 }
