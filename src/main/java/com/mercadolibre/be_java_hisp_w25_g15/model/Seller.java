@@ -10,7 +10,6 @@ import java.util.List;
 @SuperBuilder
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Getter
 public class Seller extends User{
     List<User> followers;
 }
