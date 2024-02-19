@@ -6,4 +6,6 @@ public interface IPostService {
     PostDto createPost(PostDto postDto);
 
     PostGetListDto getPostsBySellerIdLastTwoWeeks(int sellerId);
+
+
 }

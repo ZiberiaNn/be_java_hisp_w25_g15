@@ -22,7 +22,7 @@ public class PostRepository implements IPostRepository {
     final List<Post> posts = new ArrayList<>(
             List.of(
                 new Post(
-                        Seller.builder().id(1).username("Tony Stark").followed(new ArrayList<>()).followers(new ArrayList<>()).build(),
+                        1,
                         LocalDate.of(2020, 5, 5),
                         new Product(1, "Mouse", "Electronico", "Logitech", "Negro", "N/A"),
                         1,
@@ -45,4 +45,5 @@ public class PostRepository implements IPostRepository {
         posts.add(post);
         return post;
     }
+
 }
