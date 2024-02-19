@@ -6,6 +6,6 @@ import java.util.Optional;
 
 public interface IUserRepository {
     void followSeller(int userId, int userIdToFollow);
-    void unfollowSeller(int userId, int userIdToFollow);
+    void unfollowSeller(User user);
     Optional<User> getUserById(int userId);
 }
