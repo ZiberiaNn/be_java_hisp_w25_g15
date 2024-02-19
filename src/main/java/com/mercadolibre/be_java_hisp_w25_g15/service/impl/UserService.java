@@ -1,7 +1,6 @@
 package com.mercadolibre.be_java_hisp_w25_g15.service.impl;
 
 import com.mercadolibre.be_java_hisp_w25_g15.dto.request.UnfollowDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.CountFollowersDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.MessageResponseDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.UserDto;
@@ -12,7 +11,8 @@ import com.mercadolibre.be_java_hisp_w25_g15.model.Seller;
 import com.mercadolibre.be_java_hisp_w25_g15.model.User;
 import com.mercadolibre.be_java_hisp_w25_g15.repository.IUserRepository;
 import com.mercadolibre.be_java_hisp_w25_g15.service.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.mercadolibre.be_java_hisp_w25_g15.utils.ObjectMapperBean;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -22,16 +22,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
+@RequiredArgsConstructor
 public class UserService implements IUserService {
-
-    private final ObjectMapper objectMapper;
-
-    @Autowired
-    private IUserRepository userRepository;
-
-    public UserService(ObjectMapper objectMapper){
-        this.objectMapper = objectMapper;
-    }
+    private final ObjectMapperBean objectMapper;
+    private final IUserRepository userRepository;
 
     @Override
     public MessageResponseDto unfollowSeller(UnfollowDto unfollowDto) {
@@ -50,8 +44,8 @@ public class UserService implements IUserService {
             throw new NotFoundException("Seller is not followed");
         }
 
-        buyer.get().getFollowed().remove(seller.get());
-        ((Seller) seller.get()).getFollowers().remove(buyer.get());
+        buyer.get().getFollowed().removeIf(followed -> followed.getId() == seller.get().getId());
+        ((Seller) seller.get()).getFollowers().removeIf(follower -> follower.getId() == buyer.get().getId());
         userRepository.unfollowSeller(buyer.get(), seller.get());
 
         return new MessageResponseDto("User unfollowed successfully");
@@ -152,7 +146,7 @@ public class UserService implements IUserService {
 
     // Método para convertir una lista Entidad tipo User a una lista Dto tipo UserDto
     private List<UserDto> parseUsersDto(List<User> users){
-        return users.stream().map(users_->objectMapper.convertValue(users_,UserDto.class))
+        return users.stream().map(users_->objectMapper.getMapper().convertValue(users_,UserDto.class))
                 .collect(Collectors.toList());
     }
 

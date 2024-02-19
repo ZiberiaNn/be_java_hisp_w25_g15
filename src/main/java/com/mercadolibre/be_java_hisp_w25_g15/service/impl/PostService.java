@@ -1,7 +1,5 @@
 package com.mercadolibre.be_java_hisp_w25_g15.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.PostDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.request.DateOrderEnumDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.PostGetListDto;
@@ -13,6 +11,8 @@ import com.mercadolibre.be_java_hisp_w25_g15.model.User;
 import com.mercadolibre.be_java_hisp_w25_g15.repository.IPostRepository;
 import com.mercadolibre.be_java_hisp_w25_g15.repository.IUserRepository;
 import com.mercadolibre.be_java_hisp_w25_g15.service.IPostService;
+import com.mercadolibre.be_java_hisp_w25_g15.utils.ObjectMapperBean;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -22,47 +22,32 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class PostService implements IPostService {
     private final IPostRepository postRepository;
     private final IUserRepository userRepository;
-
-    public PostService(IPostRepository postRepository, IUserRepository userRepository) {
-        this.postRepository = postRepository;
-        this.userRepository = userRepository;
-    }
+    private final ObjectMapperBean mapper;
 
     @Override
     public PostDto createPost(PostDto postDto) {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        objectMapper.registerModule(javaTimeModule);
-
-        Post post = objectMapper.convertValue(postDto, Post.class);
+        Post post = mapper.getMapper().convertValue(postDto, Post.class);
         Optional<User> user = userRepository.getUserById(postDto.user_id());
         if (user.isPresent()) {
            // si el usuario es Seller puedo publicar
             if((user.get() instanceof Seller)){
                 post.setUserId(user.get().getId());
                 Post newPost = postRepository.addPost(post);
-                return objectMapper.convertValue(newPost, PostDto.class);
+                return mapper.getMapper().convertValue(newPost, PostDto.class);
             }else {
                 throw new ConflictException("User must be a seller to create a post");
             }
-
         } else {
             throw new NotFoundException("User not found");
         }
-
     }
 
     @Override
     public PostGetListDto getPostsBySellerIdLastTwoWeeks(int userId, DateOrderEnumDto dateOrder) {
-        //TODO : Unificar mappers en utils
-        ObjectMapper objectMapper = new ObjectMapper();
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        objectMapper.registerModule(javaTimeModule);
-
         User user = userRepository.getUserById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id " +userId+ "not found."));
         if(user.getFollowed() == null || user.getFollowed().isEmpty()) {
@@ -72,7 +57,7 @@ public class PostService implements IPostService {
         user.getFollowed().forEach(followedUser -> postDtoList.addAll(
                 this.postRepository.findAllPostsBySellerIdBetweenDateRange(
                         followedUser.getId(), LocalDate.now().minusWeeks(2), LocalDate.now()
-                        ).stream().map(p -> objectMapper.convertValue(p, PostDto.class)).toList()
+                        ).stream().map(p -> mapper.getMapper().convertValue(p, PostDto.class)).toList()
                 )
         );
         if(postDtoList.isEmpty()){
