@@ -1,5 +1,6 @@
 package com.mercadolibre.be_java_hisp_w25_g15.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
@@ -20,6 +21,7 @@ public class Post {
     int id;
     @JsonProperty("user_id")
     int userId;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     LocalDate date;
     Product product;
     int category;
