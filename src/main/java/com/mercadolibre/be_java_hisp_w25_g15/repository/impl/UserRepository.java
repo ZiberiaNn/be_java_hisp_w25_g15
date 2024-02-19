@@ -26,14 +26,6 @@ public class UserRepository implements IUserRepository {
             )
     );
 
-    public UserRepository(){
-        users.get(5).getFollowed().add(users.get(1));
-        users.get(5).getFollowed().add(users.get(2));
-        users.get(3).getFollowed().add(users.get(0));
-        users.get(3).getFollowed().add(users.get(1));
-        users.get(3).getFollowed().add(users.get(2));
-    }
-
     @Override
     public void followSeller(int userId, int userIdToFollow) {
         Optional<User> user = this.users.stream().filter((u)-> u.getId() == userId).findFirst();
@@ -46,9 +38,11 @@ public class UserRepository implements IUserRepository {
     }
 
     @Override
-    public void unfollowSeller(User user) {
-        User existingUser = getUserById(user.getId()).get();
-        existingUser.setFollowed(user.getFollowed());
+    public void unfollowSeller(User buyer, User seller) {
+        User existingUser = getUserById(buyer.getId()).get();
+        User existingSeller = getUserById(seller.getId()).get();
+        existingUser.setFollowed(buyer.getFollowed());
+        existingSeller.setFollowed(seller.getFollowed());
     }
 
     @Override

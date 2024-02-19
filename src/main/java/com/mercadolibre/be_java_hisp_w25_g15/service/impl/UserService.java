@@ -33,11 +33,14 @@ public class UserService implements IUserService {
 
     @Override
     public MessageResponseDto unfollowSeller(UnfollowDto unfollowDto) {
+        if (unfollowDto.userId() == unfollowDto.unfollowUserId()){
+            throw new ConflictException("Users must be different");
+        }
         Optional<User> buyer = userRepository.getUserById(unfollowDto.userId());
-        Optional<User> seller = userRepository.getUserById(unfollowDto.unfollowUserId());
         if (buyer.isEmpty()) {
             throw new NotFoundException("User not found");
         }
+        Optional<User> seller = userRepository.getUserById(unfollowDto.unfollowUserId());
         if (seller.isEmpty()){
             throw new NotFoundException("Seller not found");
         }
@@ -46,7 +49,8 @@ public class UserService implements IUserService {
         }
 
         buyer.get().getFollowed().remove(seller.get());
-        userRepository.unfollowSeller(buyer.get());
+        ((Seller) seller.get()).getFollowers().remove(buyer.get());
+        userRepository.unfollowSeller(buyer.get(), seller.get());
 
         return new MessageResponseDto("User unfollowed successfully");
     }
@@ -141,4 +145,5 @@ public class UserService implements IUserService {
         return users.stream().map(users_->objectMapper.convertValue(users_,UserDto.class))
                 .collect(Collectors.toList());
     }
+
 }
