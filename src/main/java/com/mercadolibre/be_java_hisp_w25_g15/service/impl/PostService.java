@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.PostDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.PostGetListDto;
+import com.mercadolibre.be_java_hisp_w25_g15.exception.ConflictException;
 import com.mercadolibre.be_java_hisp_w25_g15.exception.NotFoundException;
 import com.mercadolibre.be_java_hisp_w25_g15.model.Post;
 import com.mercadolibre.be_java_hisp_w25_g15.model.Seller;

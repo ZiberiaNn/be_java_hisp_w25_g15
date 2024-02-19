@@ -19,14 +19,14 @@ public class GlobalExceptionHandler {
     //Excepciones de validaciones
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<MessageResponseDto> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
-        String errorMessage = "Error de validación: " + ex.getBindingResult().getFieldError().getDefaultMessage();
+        String errorMessage = ex.getBindingResult().getFieldError().getDefaultMessage();
         return new ResponseEntity<>(new MessageResponseDto(errorMessage), HttpStatus.BAD_REQUEST);
     }
 
     //Excepciones de formato de datos, actualmente se lanza cuando se envia una fecha invalida
     @ExceptionHandler(MismatchedInputException.class)
     public ResponseEntity<Object> handleMismatchedInputException(MismatchedInputException ex) {
-        String errorMessage = "Error en el formato de los datos enviados: " + ex.getMessage();
+        String errorMessage = ex.getMessage();
         return new ResponseEntity<>(new MessageResponseDto(errorMessage), HttpStatus.BAD_REQUEST);
     }
 
