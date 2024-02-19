@@ -18,7 +18,8 @@ public class UserRepository implements IUserRepository {
                 Seller.builder().id(1).username("Tony Stark").followed(new ArrayList<>()).followers(new ArrayList<>()).build(),
                 Seller.builder().id(2).username("Luca").followed(new ArrayList<>()).followers(new ArrayList<>()).build(),
                 Seller.builder().id(3).username("Martin").followed(new ArrayList<>()).followers(new ArrayList<>()).build(),
-                Buyer.builder().id(4).username("Santiago").followed(new ArrayList<>()).build(),
+                Buyer.builder().id(4).username("Santiago").followed(new ArrayList<>(
+                )).build(),
                 Buyer.builder().id(5).username("Orlando").followed(new ArrayList<>()).build(),
                 Buyer.builder().id(6).username("Miguel").followed(new ArrayList<>()).build(),
                 Buyer.builder().id(7).username("Samuel").followed(new ArrayList<>()).build(),
@@ -26,29 +27,24 @@ public class UserRepository implements IUserRepository {
             )
     );
 
-    public UserRepository(){
-        users.get(5).getFollowed().add(users.get(1));
-        users.get(5).getFollowed().add(users.get(2));
-        users.get(3).getFollowed().add(users.get(0));
-        users.get(3).getFollowed().add(users.get(1));
-        users.get(3).getFollowed().add(users.get(2));
-    }
-
     @Override
     public void followSeller(int userId, int userIdToFollow) {
         Optional<User> user = this.users.stream().filter((u)-> u.getId() == userId).findFirst();
         Optional<User> userToFollow = this.users.stream().filter((u)->u.getId() == userIdToFollow).findFirst();
         if(user.isPresent() && userToFollow.isPresent()){
-            if(userToFollow.get() instanceof Seller)
+            if(userToFollow.get() instanceof Seller){
                 ((Seller) userToFollow.get()).getFollowers().add(user.get());
-            user.get().getFollowed().add(userToFollow.get());
+                user.get().getFollowed().add(userToFollow.get());
+            }
         }
     }
 
     @Override
-    public void unfollowSeller(User user) {
-        User existingUser = getUserById(user.getId()).get();
-        existingUser.setFollowed(user.getFollowed());
+    public void unfollowSeller(User buyer, User seller) {
+        User existingUser = getUserById(buyer.getId()).get();
+        User existingSeller = getUserById(seller.getId()).get();
+        existingUser.setFollowed(buyer.getFollowed());
+        existingSeller.setFollowed(seller.getFollowed());
     }
 
     @Override
