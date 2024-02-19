@@ -5,15 +5,19 @@ import com.mercadolibre.be_java_hisp_w25_g15.dto.response.CountFollowersDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.MessageResponseDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.SellerDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.UserDto;
+import com.mercadolibre.be_java_hisp_w25_g15.exception.ConflictException;
 import com.mercadolibre.be_java_hisp_w25_g15.exception.NotFoundException;
+import com.mercadolibre.be_java_hisp_w25_g15.model.Seller;
 import com.mercadolibre.be_java_hisp_w25_g15.model.User;
 import com.mercadolibre.be_java_hisp_w25_g15.repository.IUserRepository;
 import com.mercadolibre.be_java_hisp_w25_g15.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.sql.SQLOutput;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +39,23 @@ public class UserService implements IUserService {
 
     @Override
     public MessageResponseDto followSeller(int userId, int userIdToFollow){
-        return null;
+        Optional<User> user = this.userRepository.getUserById(userId);
+        if(user.isEmpty())
+            throw new NotFoundException("User not found");
+        Optional<User> userToFollow = this.userRepository.getUserById(userIdToFollow);
+        if(userToFollow.isEmpty())
+            throw new NotFoundException("User to follow not found");
+        if(!(userToFollow.get() instanceof Seller))
+            throw new ConflictException("User to follow is not a Seller");
+        Optional<User> resultSearchUserInFollowersOfSeller = ((Seller) userToFollow.get())
+                .getFollowers()
+                .stream()
+                .filter((v) -> v.getId() == userId)
+                .findFirst();
+        if(resultSearchUserInFollowersOfSeller.isPresent())
+            throw new ConflictException("User already is following");
+        this.userRepository.followSeller(userId, userIdToFollow);
+        return new MessageResponseDto("Seller followed correctly");
     }
 
     @Override

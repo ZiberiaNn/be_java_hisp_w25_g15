@@ -16,8 +16,8 @@ public class UserRepository implements IUserRepository {
     List<User> users = new ArrayList<>(
             List.of(
                 Seller.builder().id(1).username("Tony Stark").followed(new ArrayList<>()).followers(new ArrayList<>()).build(),
-                Seller.builder().id(2).username("Luca").followed(new ArrayList<>()).build(),
-                Seller.builder().id(3).username("Martin").followed(new ArrayList<>()).build(),
+                Seller.builder().id(2).username("Luca").followed(new ArrayList<>()).followers(new ArrayList<>()).build(),
+                Seller.builder().id(3).username("Martin").followed(new ArrayList<>()).followers(new ArrayList<>()).build(),
                 Buyer.builder().id(4).username("Santiago").followed(new ArrayList<>()).build(),
                 Buyer.builder().id(5).username("Orlando").followed(new ArrayList<>()).build(),
                 Buyer.builder().id(6).username("Miguel").followed(new ArrayList<>()).build(),
@@ -28,7 +28,13 @@ public class UserRepository implements IUserRepository {
 
     @Override
     public void followSeller(int userId, int userIdToFollow) {
-
+        Optional<User> user = this.users.stream().filter((u)-> u.getId() == userId).findFirst();
+        Optional<User> userToFollow = this.users.stream().filter((u)->u.getId() == userIdToFollow).findFirst();
+        if(user.isPresent() && userToFollow.isPresent()){
+            if(userToFollow.get() instanceof Seller)
+                ((Seller) userToFollow.get()).getFollowers().add(user.get());
+            user.get().getFollowed().add(userToFollow.get());
+        }
     }
 
     @Override

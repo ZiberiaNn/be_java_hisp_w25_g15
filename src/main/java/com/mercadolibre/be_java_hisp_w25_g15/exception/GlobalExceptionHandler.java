@@ -29,4 +29,9 @@ public class GlobalExceptionHandler {
         String errorMessage = "Error en el formato de los datos enviados: " + ex.getMessage();
         return new ResponseEntity<>(new MessageResponseDto(errorMessage), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<MessageResponseDto> handleMethodConflictException(ConflictException conflictException){
+        return new ResponseEntity<>(new MessageResponseDto(conflictException.getMessage()),HttpStatus.CONFLICT);
+    }
 }
