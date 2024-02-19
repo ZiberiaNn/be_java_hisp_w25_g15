@@ -35,11 +35,11 @@ public class UserService implements IUserService {
     public MessageResponseDto unfollowSeller(UnfollowDto unfollowDto) {
         Optional<User> buyer = userRepository.getUserById(unfollowDto.userId());
         Optional<User> seller = userRepository.getUserById(unfollowDto.unfollowUserId());
-        if (buyer.isEmpty() || seller.isEmpty()) {
+        if (buyer.isEmpty()) {
             throw new NotFoundException("User not found");
         }
-        if (!(seller.get() instanceof Seller)) {
-            throw new ConflictException("User to follow is not a Seller");
+        if (seller.isEmpty()){
+            throw new NotFoundException("Seller not found");
         }
         if (buyer.get().getFollowed().stream().noneMatch(u -> u.getId() == seller.get().getId())) {
             throw new NotFoundException("Seller is not followed");
