@@ -8,6 +8,7 @@ import com.mercadolibre.be_java_hisp_w25_g15.dto.PostDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.PostGetListDto;
 import com.mercadolibre.be_java_hisp_w25_g15.exception.NotFoundException;
 import com.mercadolibre.be_java_hisp_w25_g15.model.Post;
+import com.mercadolibre.be_java_hisp_w25_g15.model.Seller;
 import com.mercadolibre.be_java_hisp_w25_g15.model.User;
 import com.mercadolibre.be_java_hisp_w25_g15.repository.IPostRepository;
 import com.mercadolibre.be_java_hisp_w25_g15.repository.IUserRepository;
@@ -32,21 +33,22 @@ public class PostService implements IPostService {
     @Override
     public PostDto createPost(PostDto postDto) {
 
-
         ObjectMapper objectMapper = new ObjectMapper();
         JavaTimeModule javaTimeModule = new JavaTimeModule();
-
-        //agregamos el deserializador y serializador para el tipo LocalDate indicando el formato requerido
-        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
-        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
         objectMapper.registerModule(javaTimeModule);
 
         Post post = objectMapper.convertValue(postDto, Post.class);
         Optional<User> user = userRepository.getUserById(postDto.user_id());
         if (user.isPresent()) {
+           //si el usuario es Seller puedo publicar
+            if((user.get() instanceof Seller)){
+                post.setUserId(user.get().getId());
+            }else {
+                throw new ConflictException("User must be a seller to create a post");
+            }
             post.setUserId(user.get().getId());
         }else{
-            throw new NotFoundException("No se encontró el usuario con el id ingresado.");
+            throw new NotFoundException("User not found");
         }
 
         Post newPost = postRepository.addPost(post);
