@@ -45,7 +45,7 @@ public class PostService implements IPostService {
         if (user.isPresent()) {
             post.setUserId(user.get().getId());
         }else{
-            throw new NotFoundException("No se encontró el usuario.");
+            throw new NotFoundException("No se encontró el usuario con el id ingresado.");
         }
 
         Post newPost = postRepository.addPost(post);
