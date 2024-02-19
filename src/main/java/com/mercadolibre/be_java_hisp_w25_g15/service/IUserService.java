@@ -13,8 +13,6 @@ public interface IUserService {
 
     CountFollowersDto countFollowersByUserId(int userId);
 
-    List<UserDto> listFollowersBySellerId(int sellerId);
-
     UserDto findAllFollwedByUser(int userId);
 
     List<UserDto> findAll();
