@@ -36,6 +36,7 @@ public class PostService implements IPostService {
         ObjectMapper objectMapper = new ObjectMapper();
         JavaTimeModule javaTimeModule = new JavaTimeModule();
 
+        //agregamos el deserializador y serializador para el tipo LocalDate indicando el formato requerido
         javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
         javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
         objectMapper.registerModule(javaTimeModule);
