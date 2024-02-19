@@ -44,17 +44,15 @@ public class PostService implements IPostService {
            // si el usuario es Seller puedo publicar
             if((user.get() instanceof Seller)){
                 post.setUserId(user.get().getId());
+                Post newPost = postRepository.addPost(post);
+                return objectMapper.convertValue(newPost, PostDto.class);
             }else {
                 throw new ConflictException("User must be a seller to create a post");
             }
-            post.setUserId(user.get().getId());
+
         } else {
             throw new NotFoundException("User not found");
         }
-
-        Post newPost = postRepository.addPost(post);
-
-        return objectMapper.convertValue(newPost, PostDto.class);
 
     }
 
