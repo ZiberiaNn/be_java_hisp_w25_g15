@@ -16,5 +16,7 @@ public interface IUserService {
 
     UserDto findAllFollwedByUser(int userId);
 
+    UserDto findAllSellerFollowers(int sellerId);
+
     List<UserDto> findAll();
 }

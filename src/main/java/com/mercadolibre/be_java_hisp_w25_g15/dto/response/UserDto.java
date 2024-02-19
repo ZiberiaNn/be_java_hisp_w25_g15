@@ -5,6 +5,6 @@ import java.util.List;
 public record UserDto (
         int id,
         String username,
-        List<SellerDto> followed
+        List<UserListDto> users
 ) {
 }
