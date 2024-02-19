@@ -1,7 +1,10 @@
 package com.mercadolibre.be_java_hisp_w25_g15.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.CountFollowersDto;
+import com.mercadolibre.be_java_hisp_w25_g15.dto.response.SellerDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.UserDto;
+import com.mercadolibre.be_java_hisp_w25_g15.exception.NotFoundException;
 import com.mercadolibre.be_java_hisp_w25_g15.model.Seller;
 import com.mercadolibre.be_java_hisp_w25_g15.model.User;
 import com.mercadolibre.be_java_hisp_w25_g15.repository.IUserRepository;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SellerService implements ISellerService {
@@ -25,10 +29,11 @@ public class SellerService implements ISellerService {
 
         return null;
     }
-    @Override
-    public List<UserDto> findAllFollowersByUser(int sellerId){
-        Optional<User> user = this.usersRepository.getUserById(sellerId);
-        System.out.println(user.get().getFollowed());
-        return null;
+
+
+    private List<UserDto> parseUsersDto(List<User> users){
+        ObjectMapper objectMapper = new ObjectMapper();
+        return users.stream().map(users_->objectMapper.convertValue(users_,UserDto.class))
+                .collect(Collectors.toList());
     }
 }

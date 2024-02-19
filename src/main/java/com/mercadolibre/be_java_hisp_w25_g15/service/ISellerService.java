@@ -6,6 +6,5 @@ import java.util.List;
 
 public interface ISellerService {
     CountFollowersDto numberOfFollowers(int id);
-    List<UserDto> findAllFollowersByUser(int sellerId);
 
 }

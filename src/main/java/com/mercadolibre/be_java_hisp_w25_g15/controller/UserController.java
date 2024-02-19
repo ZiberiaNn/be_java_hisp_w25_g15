@@ -16,11 +16,9 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController {
     IUserService userService;
-    ISellerService sellerService;
 
-    public UserController(IUserService userService, SellerService sellerService){
+    public UserController(IUserService userService){
         this.userService = userService;
-        this.sellerService = sellerService;
     }
 
     @PostMapping("/{userId}/follow/{userIdToFollow}")
@@ -51,7 +49,7 @@ public class UserController {
     }
 
     @GetMapping("/users/{userId}/followers/list")
-    public ResponseEntity<List<UserDto>> getAllFollowersByUser(@PathVariable int userId){
-        return new ResponseEntity<>(sellerService.findAllFollowersByUser(userId), HttpStatus.OK);
+    public ResponseEntity<UserDto> getAllFollowersByUser(@PathVariable int userId){
+        return new ResponseEntity<>(userService.findAllSellerFollowers(userId), HttpStatus.OK);
     }
 }

@@ -62,6 +62,21 @@ public class UserService implements IUserService {
     public CountFollowersDto countFollowersByUserId(int userId){
         return null;
     }
+    @Override
+    public UserDto findAllSellerFollowers(int sellerId){
+        if (this.userRepository.getUserById(sellerId).isEmpty()) {
+            throw new NotFoundException("Seller not found");
+        }else if (!(this.userRepository.getUserById(sellerId).get() instanceof Seller)) {
+            throw new NotFoundException("User is not a seller");
+        } else if (this.userRepository.getUserById(sellerId).get().getFollowed().isEmpty()) {
+            throw new NotFoundException("Seller has no followers");
+        }else {
+            User user = userRepository.getFollowedUserById(sellerId);
+            UserDto userDto = objectMapper.convertValue(user,UserDto.class);
+            List<SellerDto> sellerDtos = parseSellersDto(user.getFollowed());
+            return new UserDto(userDto.id(),userDto.username(),sellerDtos);
+        }
+    }
 
     @Override
     public UserDto findAllFollwedByUser(int userId) {
