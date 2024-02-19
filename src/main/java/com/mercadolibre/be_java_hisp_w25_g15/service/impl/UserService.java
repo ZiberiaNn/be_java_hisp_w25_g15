@@ -1,5 +1,6 @@
 package com.mercadolibre.be_java_hisp_w25_g15.service.impl;
 
+import com.mercadolibre.be_java_hisp_w25_g15.dto.request.UnfollowDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.CountFollowersDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.MessageResponseDto;
@@ -14,10 +15,8 @@ import com.mercadolibre.be_java_hisp_w25_g15.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
-import java.sql.SQLOutput;
-import java.util.List;
 import java.util.Optional;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,8 +32,23 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public MessageResponseDto unfollowSeller(int userId, int userIdToUnfollow){
-        return null;
+    public MessageResponseDto unfollowSeller(UnfollowDto unfollowDto) {
+        Optional<User> buyer = userRepository.getUserById(unfollowDto.userId());
+        Optional<User> seller = userRepository.getUserById(unfollowDto.unfollowUserId());
+        if (buyer.isEmpty()) {
+            throw new NotFoundException("User not found");
+        }
+        if (seller.isEmpty()){
+            throw new NotFoundException("Seller not found");
+        }
+        if (buyer.get().getFollowed().stream().noneMatch(u -> u.getId() == seller.get().getId())) {
+            throw new NotFoundException("Seller is not followed");
+        }
+
+        buyer.get().getFollowed().remove(seller.get());
+        userRepository.unfollowSeller(buyer.get());
+
+        return new MessageResponseDto("User unfollowed successfully");
     }
 
     @Override

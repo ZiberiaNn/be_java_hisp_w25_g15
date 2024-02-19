@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    IUserService userService;
+    private final IUserService userService;
 
     public UserController(IUserService userService) {
         this.userService = userService;
@@ -43,8 +43,9 @@ public class UserController {
 
 
     @PostMapping("/{userId}/unfollow/{userIdToUnfollow}")
-    public ResponseEntity<MessageResponseDto> unfollowUser(@RequestBody UnfollowDto unfollowDto) {
-        return new ResponseEntity<>(null, HttpStatus.OK);
+    public ResponseEntity<MessageResponseDto> unfollowUser(@PathVariable int userId, @PathVariable int userIdToUnfollow){
+        UnfollowDto unfollowDto = new UnfollowDto(userId, userIdToUnfollow);
+        return new ResponseEntity<>(userService.unfollowSeller(unfollowDto), HttpStatus.OK);
     }
 
     @GetMapping("/get-users")
