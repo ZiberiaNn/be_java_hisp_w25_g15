@@ -108,7 +108,8 @@ public class UserService implements IUserService {
         } else if (((Seller) user).getFollowers().isEmpty()) {
             throw new NotFoundException("Seller has no followers");
         } else {
-            return new UserDto( user.getId(), user.getUsername(), parseUsersToUserListDto(((Seller) user).getFollowers(), order), null);
+            List<UserListDto> userListDtos = createUserListDto(((Seller) user).getFollowers());
+            return new UserDto( user.getId(), user.getUsername(), sortUserListDto(userListDtos, order) , null);
         }
     }
 
@@ -124,7 +125,8 @@ public class UserService implements IUserService {
             throw new NotFoundException("User has not followed");
         }else{
             // Se encapsula en un objeto DTO con atributos DTO
-            return new UserDto( user.getId(), user.getUsername(), null, parseUsersToUserListDto(user.getFollowed(), order));
+            List<UserListDto> userListDtos = createUserListDto(user.getFollowed());
+            return new UserDto( user.getId(), user.getUsername(), null, sortUserListDto(userListDtos, order));
         }
     }
 
@@ -137,17 +139,23 @@ public class UserService implements IUserService {
     }
 
     // Método para convertir una lista Entidad tipo User a una lista Dto tipo SellerDto
-    private List<UserListDto> parseUsersToUserListDto(List<User> users , String order){
-        Stream<UserListDto> userListDtoStream = users.stream()
-                .map(user -> new UserListDto(user.getId(),user.getUsername()));
+    private List<UserListDto> createUserListDto(List<User> users){
+        return users.stream()
+                .map(user -> new UserListDto(user.getId(),user.getUsername()))
+                .toList();
+    }
+
+    private List<UserListDto> sortUserListDto(List<UserListDto> userListDtos, String order){
         if (order != null) {
-            if (order.equals("name_asc")) {
-                userListDtoStream = userListDtoStream.sorted(Comparator.comparing(UserListDto::getUsername));
-            } else if (order.equals("name_desc")) {
-                userListDtoStream = userListDtoStream.sorted(Comparator.comparing(UserListDto::getUsername).reversed());
+            if (order.equals("name_asc") && userListDtos.size() > 1) {
+                // sort by name asc
+                userListDtos = userListDtos.stream().sorted(Comparator.comparing(UserListDto::getUsername)).collect(Collectors.toList());
+            } else if (order.equals("name_desc") && userListDtos.size() > 1) {
+                // sort by name desc
+                userListDtos = userListDtos.stream().sorted(Comparator.comparing(UserListDto::getUsername).reversed()).collect(Collectors.toList());
             }
         }
-        return userListDtoStream.toList();
+        return userListDtos;
     }
 
     // Método para convertir una lista Entidad tipo User a una lista Dto tipo UserDto
