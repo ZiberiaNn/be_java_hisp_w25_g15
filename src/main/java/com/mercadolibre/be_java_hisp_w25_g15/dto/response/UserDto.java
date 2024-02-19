@@ -5,6 +5,7 @@ import java.util.List;
 public record UserDto (
         int id,
         String username,
-        List<UserListDto> users
+        List<UserListDto> followers,
+        List<UserListDto> followed
 ) {
 }

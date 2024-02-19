@@ -102,7 +102,7 @@ public class UserService implements IUserService {
         } else if (((Seller) user).getFollowers().isEmpty()) {
             throw new NotFoundException("Seller has no followers");
         } else {
-            return new UserDto( user.getId(), user.getUsername(), parseSellersDto(((Seller) user).getFollowers()));
+            return new UserDto( user.getId(), user.getUsername(), parseUsersToUserListDto(((Seller) user).getFollowers()), null);
         }
     }
 
@@ -110,17 +110,15 @@ public class UserService implements IUserService {
     public UserDto findAllFollwedByUser(int userId) {
         // Se valida si el usuario existe
         if(userRepository.getUserById(userId).isEmpty()){
-            throw  new NotFoundException("No existe el usuario");
+            throw  new NotFoundException("User not found");
         }
         // Se valida si el usuario tiene seguidores
         User user = userRepository.getFollowedUserById(userId);
         if(user == null){
-            throw new NotFoundException("El usuario no tiene seguidores");
+            throw new NotFoundException("User has not followed");
         }else{
             // Se encapsula en un objeto DTO con atributos DTO
-            UserDto userDto = objectMapper.convertValue(user,UserDto.class);
-            List<UserListDto> sellerDtos = parseSellersDto(user.getFollowed());
-            return new UserDto(userDto.id(),userDto.username(),sellerDtos);
+            return new UserDto( user.getId(), user.getUsername(), null, parseUsersToUserListDto(user.getFollowed()));
         }
     }
 
@@ -133,7 +131,7 @@ public class UserService implements IUserService {
     }
 
     // Método para convertir una lista Entidad tipo User a una lista Dto tipo SellerDto
-    private List<UserListDto> parseSellersDto(List<User> users){
+    private List<UserListDto> parseUsersToUserListDto(List<User> users){
         return users.stream().map(user-> new UserListDto(user.getId(),user.getUsername()))
                 .toList();
     }
