@@ -108,17 +108,16 @@ public class UserService implements IUserService {
 
     @Override
     public UserDto findAllFollowedByUser(int userId, String order) {
+        Optional<User> user = userRepository.getUserById(userId);
         // Se valida si el usuario existe
-        if(userRepository.getUserById(userId).isEmpty()){
+        if(user.isEmpty()){
             throw  new NotFoundException("User not found");
         }
-        // Se valida si el usuario tiene seguidores
-        User user = userRepository.getFollowedUserById(userId);
-        if(user == null){
+        if(user.get().getFollowed().isEmpty()){
             throw new NotFoundException("User has not followed");
         }else{
             // Se encapsula en un objeto DTO con atributos DTO
-            return new UserDto( user.getId(), user.getUsername(), null, parseUsersToUserListDto(user.getFollowed(), order));
+            return new UserDto( user.get().getId(), user.get().getUsername(), null, parseUsersToUserListDto(user.get().getFollowed(), order));
         }
     }
 

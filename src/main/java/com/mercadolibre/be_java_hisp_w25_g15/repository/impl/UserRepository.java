@@ -53,11 +53,6 @@ public class UserRepository implements IUserRepository {
     }
 
     @Override
-    public User getFollowedUserById(int userId) {
-        return this.users.stream().filter(user->user.getId()==userId && !user.getFollowed().isEmpty()).findFirst().orElse(null);
-    }
-
-    @Override
     public List<User> getAllUsers() {
         return this.users;
     }
