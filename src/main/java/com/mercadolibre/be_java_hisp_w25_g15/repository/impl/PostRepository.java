@@ -2,8 +2,6 @@ package com.mercadolibre.be_java_hisp_w25_g15.repository.impl;
 
 import com.mercadolibre.be_java_hisp_w25_g15.model.Post;
 import com.mercadolibre.be_java_hisp_w25_g15.model.Product;
-import com.mercadolibre.be_java_hisp_w25_g15.model.Seller;
-import com.mercadolibre.be_java_hisp_w25_g15.model.User;
 import com.mercadolibre.be_java_hisp_w25_g15.repository.IPostRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +21,7 @@ public class PostRepository implements IPostRepository {
             List.of(
                 new Post(
                         1,
-                        LocalDate.of(2020, 5, 5),
+                        LocalDate.of(2024, 2, 14),
                         new Product(1, "Mouse", "Electronico", "Logitech", "Negro", "N/A"),
                         1,
                         300.0
@@ -34,7 +32,7 @@ public class PostRepository implements IPostRepository {
     public List<Post> findAllPostsBySellerIdBetweenDateRange(int sellerId, LocalDate startDate, LocalDate endDate){
         return posts.stream()
                 .filter(post ->
-                        post.getId() == sellerId
+                        post.getUserId() == sellerId
                         && post.getDate().isBefore(endDate)
                         && post.getDate().isAfter(startDate))
                 .toList();
