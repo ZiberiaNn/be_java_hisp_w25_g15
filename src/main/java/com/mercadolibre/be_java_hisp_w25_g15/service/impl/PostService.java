@@ -3,6 +3,7 @@ package com.mercadolibre.be_java_hisp_w25_g15.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.PostDto;
+import com.mercadolibre.be_java_hisp_w25_g15.dto.request.DateOrderEnumDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.PostGetListDto;
 import com.mercadolibre.be_java_hisp_w25_g15.exception.ConflictException;
 import com.mercadolibre.be_java_hisp_w25_g15.exception.NotFoundException;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,7 +59,7 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public PostGetListDto getPostsBySellerIdLastTwoWeeks(int userId) {
+    public PostGetListDto getPostsBySellerIdLastTwoWeeks(int userId, DateOrderEnumDto dateOrder) {
         //TODO : Unificar mappers en utils
         ObjectMapper objectMapper = new ObjectMapper();
         JavaTimeModule javaTimeModule = new JavaTimeModule();
@@ -78,9 +80,18 @@ public class PostService implements IPostService {
         if(postDtoList.isEmpty()){
             throw new NotFoundException("The users followed by the user with id " +userId+ " haven´t posted in the last two weeks.");
         }
+        sortPostDtoListByDate(dateOrder, postDtoList);
         return new PostGetListDto(
                 userId,
                 postDtoList
         );
+    }
+    private static void sortPostDtoListByDate(DateOrderEnumDto dateOrder, List<PostDto> postDtoList) {
+        if(dateOrder == null) return;
+        Comparator<String> order = Comparator.reverseOrder();
+        if(dateOrder == DateOrderEnumDto.DATE_ASC) {
+            order = Comparator.naturalOrder();
+        }
+        postDtoList.sort(Comparator.comparing(PostDto::date, order));
     }
 }
