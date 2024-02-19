@@ -4,8 +4,8 @@ import com.mercadolibre.be_java_hisp_w25_g15.dto.request.UnfollowDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.CountFollowersDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.MessageResponseDto;
-import com.mercadolibre.be_java_hisp_w25_g15.dto.response.SellerDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.UserDto;
+import com.mercadolibre.be_java_hisp_w25_g15.dto.response.UserListDto;
 import com.mercadolibre.be_java_hisp_w25_g15.exception.ConflictException;
 import com.mercadolibre.be_java_hisp_w25_g15.exception.NotFoundException;
 import com.mercadolibre.be_java_hisp_w25_g15.model.Seller;
@@ -89,17 +89,20 @@ public class UserService implements IUserService {
     }
     @Override
     public UserDto findAllSellerFollowers(int sellerId){
-        if (this.userRepository.getUserById(sellerId).isEmpty()) {
+        Optional<User> optionalUser = this.userRepository.getUserById(sellerId);
+
+        if (optionalUser.isEmpty()) {
             throw new NotFoundException("Seller not found");
-        }else if (!(this.userRepository.getUserById(sellerId).get() instanceof Seller)) {
+        }
+
+        User user = optionalUser.get();
+
+        if (!(user instanceof Seller)) {
             throw new NotFoundException("User is not a seller");
-        } else if (this.userRepository.getUserById(sellerId).get().getFollowed().isEmpty()) {
+        } else if (((Seller) user).getFollowers().isEmpty()) {
             throw new NotFoundException("Seller has no followers");
-        }else {
-            User user = userRepository.getFollowedUserById(sellerId);
-            UserDto userDto = objectMapper.convertValue(user,UserDto.class);
-            List<SellerDto> sellerDtos = parseSellersDto(user.getFollowed());
-            return new UserDto(userDto.id(),userDto.username(),sellerDtos);
+        } else {
+            return new UserDto( user.getId(), user.getUsername(), parseSellersDto(((Seller) user).getFollowers()));
         }
     }
 
@@ -116,7 +119,7 @@ public class UserService implements IUserService {
         }else{
             // Se encapsula en un objeto DTO con atributos DTO
             UserDto userDto = objectMapper.convertValue(user,UserDto.class);
-            List<SellerDto> sellerDtos = parseSellersDto(user.getFollowed());
+            List<UserListDto> sellerDtos = parseSellersDto(user.getFollowed());
             return new UserDto(userDto.id(),userDto.username(),sellerDtos);
         }
     }
@@ -130,9 +133,9 @@ public class UserService implements IUserService {
     }
 
     // Método para convertir una lista Entidad tipo User a una lista Dto tipo SellerDto
-    private List<SellerDto> parseSellersDto(List<User> sellers){
-        return sellers.stream().map(seller->objectMapper.convertValue(seller,SellerDto.class))
-                .collect(Collectors.toList());
+    private List<UserListDto> parseSellersDto(List<User> users){
+        return users.stream().map(user-> new UserListDto(user.getId(),user.getUsername()))
+                .toList();
     }
 
     // Método para convertir una lista Entidad tipo User a una lista Dto tipo UserDto
