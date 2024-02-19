@@ -19,6 +19,18 @@ public class UserController {
         this.userService = userService;
     }
 
+    @PostMapping("/{userId}/follow/{userIdToFollow}")
+    public ResponseEntity<MessageResponseDto> followUser(
+            @PathVariable int userId,
+            @PathVariable int userIdToFollow
+    ){
+        return new ResponseEntity<>(
+                this.userService.followSeller(userId, userIdToFollow),
+                HttpStatus.OK
+        );
+    }
+
+
     @PostMapping("/{userId}/unfollow/{userIdToUnfollow}")
     public ResponseEntity<MessageResponseDto> unfollowUser(@RequestBody UnfollowDto unfollowDto){
         return  new ResponseEntity<>(null, HttpStatus.OK);
