@@ -24,7 +24,6 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService {
-    private final ObjectMapperBean objectMapper;
     private final IUserRepository userRepository;
 
     @Override
@@ -131,7 +130,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public List<UserDto> findAll() {
+    public List<UserListDto> findAll() {
         if(userRepository.getAllUsers().isEmpty()){
             throw new NotFoundException("Usuarios no registrados");
         }
@@ -159,9 +158,9 @@ public class UserService implements IUserService {
     }
 
     // Método para convertir una lista Entidad tipo User a una lista Dto tipo UserDto
-    private List<UserDto> parseUsersDto(List<User> users){
-        return users.stream().map(users_->objectMapper.getMapper().convertValue(users_,UserDto.class))
-                .collect(Collectors.toList());
+    private List<UserListDto> parseUsersDto(List<User> users){
+        return users.stream().map(u -> new UserListDto(u.getId(), u.getUsername()))
+                .toList();
     }
 
 }

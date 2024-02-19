@@ -4,6 +4,7 @@ import com.mercadolibre.be_java_hisp_w25_g15.dto.request.UnfollowDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.CountFollowersDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.MessageResponseDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.UserDto;
+import com.mercadolibre.be_java_hisp_w25_g15.dto.response.UserListDto;
 import com.mercadolibre.be_java_hisp_w25_g15.service.IUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +50,7 @@ public class UserController {
     }
 
     @GetMapping("/get-users")
-    public ResponseEntity<List<UserDto>> getAllUsers() {
+    public ResponseEntity<List<UserListDto>> getAllUsers() {
         return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
     }
 
