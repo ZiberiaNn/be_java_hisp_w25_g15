@@ -46,8 +46,8 @@ public class UserService implements IUserService {
 
         buyer.get().getFollowed().removeIf(followed -> followed.getId() == seller.get().getId());
         ((Seller) seller.get()).getFollowers().removeIf(follower -> follower.getId() == buyer.get().getId());
-        userRepository.unfollowSeller(buyer.get(), seller.get());
-
+        userRepository.updateFollowedList(buyer.get());
+        userRepository.updateFollowerList(seller.get());
         return new MessageResponseDto("User unfollowed successfully");
     }
 
@@ -70,7 +70,13 @@ public class UserService implements IUserService {
                 .findFirst();
         if(resultSearchUserInFollowersOfSeller.isPresent())
             throw new ConflictException("User already is following");
-        this.userRepository.followSeller(userId, userIdToFollow);
+
+        user.get().getFollowed().add(userToFollow.get());
+        ((Seller) userToFollow.get()).getFollowers().add(user.get());
+
+        this.userRepository.updateFollowerList(userToFollow.get());
+        this.userRepository.updateFollowedList(user.get());
+
         return new MessageResponseDto("Seller followed correctly");
     }
 

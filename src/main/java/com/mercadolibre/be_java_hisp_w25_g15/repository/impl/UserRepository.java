@@ -28,23 +28,15 @@ public class UserRepository implements IUserRepository {
     );
 
     @Override
-    public void followSeller(int userId, int userIdToFollow) {
-        Optional<User> user = this.users.stream().filter((u)-> u.getId() == userId).findFirst();
-        Optional<User> userToFollow = this.users.stream().filter((u)->u.getId() == userIdToFollow).findFirst();
-        if(user.isPresent() && userToFollow.isPresent()){
-            if(userToFollow.get() instanceof Seller){
-                ((Seller) userToFollow.get()).getFollowers().add(user.get());
-                user.get().getFollowed().add(userToFollow.get());
-            }
-        }
+    public void updateFollowedList(User user) {
+        User existingUser = getUserById(user.getId()).get();
+        existingUser.setFollowed(existingUser.getFollowed());
     }
 
     @Override
-    public void unfollowSeller(User buyer, User seller) {
-        User existingUser = getUserById(buyer.getId()).get();
-        User existingSeller = getUserById(seller.getId()).get();
-        existingUser.setFollowed(buyer.getFollowed());
-        existingSeller.setFollowed(seller.getFollowed());
+    public void updateFollowerList(User user) {
+        Seller existingSeller = (Seller) getUserById(user.getId()).get();
+        existingSeller.setFollowers(((Seller) user).getFollowers());
     }
 
     @Override
