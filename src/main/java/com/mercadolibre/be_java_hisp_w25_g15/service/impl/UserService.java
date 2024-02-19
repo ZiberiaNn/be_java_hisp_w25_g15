@@ -39,6 +39,8 @@ public class UserService implements IUserService {
 
     @Override
     public MessageResponseDto followSeller(int userId, int userIdToFollow){
+        if(userId == userIdToFollow)
+            throw new ConflictException("Users must be different");
         Optional<User> user = this.userRepository.getUserById(userId);
         if(user.isEmpty())
             throw new NotFoundException("User not found");
@@ -60,7 +62,16 @@ public class UserService implements IUserService {
 
     @Override
     public CountFollowersDto countFollowersByUserId(int userId){
-        return null;
+        Optional<User> user = this.userRepository.getUserById(userId);
+        if(user.isEmpty())
+            throw new NotFoundException("User not found");
+        if(!(user.get() instanceof Seller))
+            throw new ConflictException("User is not a Seller");
+        return new CountFollowersDto(
+          user.get().getId(),
+          user.get().getUsername(),
+          ((Seller) user.get()).getFollowers().size()
+        );
     }
 
     @Override
