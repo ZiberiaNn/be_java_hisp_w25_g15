@@ -4,4 +4,7 @@ public record UserListDto(
         int user_id,
         String username
 ){
+    public String getUsername() {
+        return username;
+    }
 }
