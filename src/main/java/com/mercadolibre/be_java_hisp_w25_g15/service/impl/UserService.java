@@ -123,7 +123,7 @@ public class UserService implements IUserService {
             throw new NotFoundException("User has not followed");
         }else{
             // Se encapsula en un objeto DTO con atributos DTO
-            return new UserDto( user.get().getId(), user.get().getUsername(), null, createUserListDto(user.get().getFollowed()));
+            return new UserDto( user.get().getId(), user.get().getUsername(), null, sortUserListDto(createUserListDto(user.get().getFollowed()), order));
         }
     }
 
