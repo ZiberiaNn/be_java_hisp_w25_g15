@@ -2,6 +2,7 @@ package com.mercadolibre.be_java_hisp_w25_g15.controller;
 
 import com.mercadolibre.be_java_hisp_w25_g15.dto.PostDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.request.DateOrderEnumDto;
+import com.mercadolibre.be_java_hisp_w25_g15.dto.response.CountPromoPostDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.PostGetListDto;
 import com.mercadolibre.be_java_hisp_w25_g15.service.IPostService;
 import jakarta.validation.Valid;
@@ -22,6 +23,24 @@ public class PostController {
     @PostMapping("/post")
     ResponseEntity<PostDto> createPost(@RequestBody @Valid PostDto post){
         return new ResponseEntity<>(iPostService.createPost(post), HttpStatus.OK);
+    }
+
+    @PostMapping ("/promo-post")
+    ResponseEntity<PostDto> createPromoPost(@RequestBody @Valid PostDto post){
+        return new ResponseEntity<>(iPostService.createPost(post), HttpStatus.OK);
+    }
+
+    @GetMapping("promo-post/count")
+    ResponseEntity<CountPromoPostDto> countPromoPostByUser(@RequestParam (name = "user_id") int userId){
+        return new ResponseEntity<>(iPostService.countPromoPostByUser(userId), HttpStatus.OK);
+    }
+
+    @GetMapping("/promo-post/list")
+    ResponseEntity<PostGetListDto> getPromoPostsByUser(
+            @RequestParam (name = "user_id") int userId,
+            @RequestParam(name = "order", required = false) DateOrderEnumDto order
+            ){
+        return new ResponseEntity<>(iPostService.getPromoPostsByUser(userId, order), HttpStatus.OK);
     }
     @GetMapping("/followed/{userId}/list")
     ResponseEntity<PostGetListDto> getPostsBySellerIdLastTwoWeeks(

@@ -1,6 +1,7 @@
 package com.mercadolibre.be_java_hisp_w25_g15.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -21,6 +22,11 @@ public record PostDto (
         @Positive(message = "The category must be a positive integer")
         int category,
         @Positive(message = "The price must be a positive number")
-        double price
+        double price,
+        @Nullable
+        Boolean has_promo,
+        @Nullable
+        @Positive(message = "The price must be a positive number")
+        Double discount
 ){
 }

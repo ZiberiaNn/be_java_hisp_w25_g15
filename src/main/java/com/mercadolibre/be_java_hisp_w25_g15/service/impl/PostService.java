@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.PostDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.request.DateOrderEnumDto;
+import com.mercadolibre.be_java_hisp_w25_g15.dto.response.CountPromoPostDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.PostGetListDto;
 import com.mercadolibre.be_java_hisp_w25_g15.exception.ConflictException;
 import com.mercadolibre.be_java_hisp_w25_g15.exception.NotFoundException;
@@ -56,6 +57,18 @@ public class PostService implements IPostService {
 
         return objectMapper.convertValue(newPost, PostDto.class);
 
+    }
+
+    @Override
+    public CountPromoPostDto countPromoPostByUser(int userId) {
+        User user = userRepository.getUserById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id " +userId+ "not found."));
+        return new CountPromoPostDto(userId, user.getUsername(), this.postRepository.countPromoPostByUser(userId));
+    }
+
+    @Override
+    public PostGetListDto getPromoPostsByUser(int userId, DateOrderEnumDto dateOrder) {
+        return null;
     }
 
     @Override

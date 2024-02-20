@@ -1,5 +1,6 @@
 package com.mercadolibre.be_java_hisp_w25_g15.repository.impl;
 
+import com.mercadolibre.be_java_hisp_w25_g15.dto.PostDto;
 import com.mercadolibre.be_java_hisp_w25_g15.model.Post;
 import com.mercadolibre.be_java_hisp_w25_g15.model.Product;
 import com.mercadolibre.be_java_hisp_w25_g15.repository.IPostRepository;
@@ -65,4 +66,12 @@ public class PostRepository implements IPostRepository {
         return post;
     }
 
+    @Override
+    public Integer countPromoPostByUser(int userId) {
+        return posts.stream()
+                .filter(post ->
+                        post.getUserId() == userId
+                        && post.getHas_promo())
+                .toList().size();
+    }
 }

@@ -26,6 +26,8 @@ public class Post {
     Product product;
     int category;
     double price;
+    Boolean has_promo = false;
+    Double discount = 0.0;
     public Post(int user, LocalDate date, Product product, int category, double price) {
         this.id = idGenerator.incrementAndGet();
         this.userId = user;
@@ -33,5 +35,28 @@ public class Post {
         this.product = product;
         this.category = category;
         this.price = price;
+    }
+
+    public Post(int user, LocalDate date, Product product, int category, double price, Boolean has_promo, Double discount) {
+        this.id = idGenerator.incrementAndGet();
+        this.userId = user;
+        this.date = date;
+        this.product = product;
+        this.category = category;
+        this.price = price;
+        this.has_promo = has_promo;
+        this.discount = discount;
+    }
+
+    private void sethas_promo(Boolean has_promo) {
+        if (has_promo != null) {
+            this.has_promo = has_promo;
+        }
+    }
+
+    private void setdiscount(Double discount) {
+        if (discount != null) {
+            this.discount = discount;
+        }
     }
 }
