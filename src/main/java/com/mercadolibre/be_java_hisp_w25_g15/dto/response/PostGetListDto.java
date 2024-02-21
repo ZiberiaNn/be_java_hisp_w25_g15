@@ -6,6 +6,7 @@ import java.util.List;
 
 public record PostGetListDto (
         int id,
+        String username,
         List<PostDto> posts
 ) {
 }

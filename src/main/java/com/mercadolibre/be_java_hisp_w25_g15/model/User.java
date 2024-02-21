@@ -21,6 +21,7 @@ public abstract class User {
     int id;
     String username;
     List<User> followed;
+    List<Post> posts;
 
     @Override
     public boolean equals(Object o) {
@@ -29,7 +30,8 @@ public abstract class User {
         User user = (User) o;
         return id == user.id &&
                 Objects.equals(username, user.username) &&
-                Objects.equals(followed, user.followed);
+                Objects.equals(followed, user.followed) &&
+                Objects.equals(posts, user.posts);
     }
 }
 

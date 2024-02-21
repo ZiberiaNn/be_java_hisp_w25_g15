@@ -28,6 +28,7 @@ public class PostService implements IPostService {
     private final IUserRepository userRepository;
     private final ObjectMapperBean mapper;
 
+    private final List<Post> postList = new ArrayList<>();
     @Override
     public PostDto createPost(PostDto postDto) {
         Post post = mapper.getMapper().convertValue(postDto, Post.class);
@@ -37,6 +38,9 @@ public class PostService implements IPostService {
             if((user.get() instanceof Seller)){
                 post.setUserId(user.get().getId());
                 Post newPost = postRepository.addPost(post);
+                //postList.stream().filter(post_->post_.getId()==newPost.getId()).collect(Collectors.toList());
+                postList.add(newPost);
+                user.get().setPosts(postList);
                 return mapper.getMapper().convertValue(newPost, PostDto.class);
             }else {
                 throw new ConflictException("User must be a seller to create a post");
@@ -66,6 +70,7 @@ public class PostService implements IPostService {
         sortPostDtoListByDate(dateOrder, postDtoList);
         return new PostGetListDto(
                 userId,
+                user.getUsername(),
                 postDtoList
         );
     }

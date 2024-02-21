@@ -24,28 +24,36 @@ public class PostRepository implements IPostRepository {
                             LocalDate.of(2024, 2, 14),
                             new Product(1, "Mouse", "Electronico", "Logitech", "Negro", "N/A"),
                             1,
-                            300.0
+                            300.0,
+                            false,
+                            0.0
                     ),
                     new Post(
                             1,
                             LocalDate.of(2024, 2, 18),
                             new Product(2, "Celular", "Movil", "Apple", "Negro", "Nuevo"),
                             2,
-                            5000
+                            5000,
+                            true,
+                            0.10
                     ),
                     new Post(
                             2,
                             LocalDate.of(2024, 2, 6),
                             new Product(3, "Carro", "Automatico", "Chevrolet", "Azul", "Usado"),
                             3,
-                            50000
+                            50000,
+                            false,
+                            0.0
                     ),
                     new Post(
                             1,
                             LocalDate.of(2024, 2, 13),
                             new Product(1, "Teclado", "Inalámbrico", "Logitech", "Blanco", "N/A"),
                             1,
-                            600.0
+                            600.0,
+                            true,
+                            0.50
                     )
             )
     );

@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
+import jdk.jfr.BooleanFlag;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -23,6 +24,10 @@ public record PostDto (
         @Positive(message = "The category must be a positive integer")
         int category,
         @Positive(message = "The price must be a positive number")
-        double price
+        double price,
+        @BooleanFlag
+        boolean has_promo,
+        @Nullable
+        double discount
 ){
 }

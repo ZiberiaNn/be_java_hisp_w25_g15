@@ -1,12 +1,13 @@
 package com.mercadolibre.be_java_hisp_w25_g15.service.impl;
 
+import com.mercadolibre.be_java_hisp_w25_g15.dto.PostDto;
+import com.mercadolibre.be_java_hisp_w25_g15.dto.ProductDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.request.UnfollowDto;
-import com.mercadolibre.be_java_hisp_w25_g15.dto.response.CountFollowersDto;
-import com.mercadolibre.be_java_hisp_w25_g15.dto.response.MessageResponseDto;
-import com.mercadolibre.be_java_hisp_w25_g15.dto.response.UserDto;
-import com.mercadolibre.be_java_hisp_w25_g15.dto.response.UserListDto;
+import com.mercadolibre.be_java_hisp_w25_g15.dto.response.*;
 import com.mercadolibre.be_java_hisp_w25_g15.exception.ConflictException;
 import com.mercadolibre.be_java_hisp_w25_g15.exception.NotFoundException;
+import com.mercadolibre.be_java_hisp_w25_g15.model.Post;
+import com.mercadolibre.be_java_hisp_w25_g15.model.Product;
 import com.mercadolibre.be_java_hisp_w25_g15.model.Seller;
 import com.mercadolibre.be_java_hisp_w25_g15.model.User;
 import com.mercadolibre.be_java_hisp_w25_g15.repository.IUserRepository;
@@ -15,6 +16,7 @@ import com.mercadolibre.be_java_hisp_w25_g15.utils.ObjectMapperBean;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.List;
@@ -135,6 +137,70 @@ public class UserService implements IUserService {
        return parseUsersDto(userRepository.getAllUsers());
     }
 
+    @Override
+    public List<UserListDto> findAllPage(int page, int size) {
+        if(userRepository.getAllUsers().isEmpty()){
+            throw new NotFoundException("Users don't registered");
+        }
+        int startIndex = page * size;
+        int endIndex = Math.min(startIndex +  size, userRepository.getAllUsers().size());
+        if(startIndex>=endIndex){
+            throw new NotFoundException("There aren't users in this range");
+        }
+        return parseUsersDto(userRepository.getAllUsers().subList(startIndex,endIndex));
+    }
+
+    @Override
+    public PostGetListDto findAllProductsPromoByUser(int userId) {
+        Optional<User> user = userRepository.getUserById(userId);
+        if(user.isEmpty()){
+            throw  new NotFoundException("User not found");
+        }
+        if(user.get().getPosts().isEmpty()){
+            throw new NotFoundException("User "+ user.get().getId() +" has not posts");
+        }else{
+            List<Post> posts = user.get().getPosts().stream().filter(post->post.getUserId()==userId && post.isHas_promo()).toList();
+            if(posts.isEmpty()){
+                throw new NotFoundException("User " + user.get().getUsername() + " has not promo products");
+            }
+            return new PostGetListDto( user.get().getId(), user.get().getUsername(), parsePostsDto(posts));
+        }
+    }
+
+    @Override
+    public CountPromoProductsDto countAllPromoProductsByUser(int userId) {
+        Optional<User> user = userRepository.getUserById(userId);
+        if(user.isEmpty()){
+            throw  new NotFoundException("User not found");
+        }
+        if(user.get().getPosts().isEmpty()){
+            throw new NotFoundException("User "+ user.get().getUsername() +" has not posts");
+        }else{
+            long countPosts = user.get().getPosts().stream().filter(post->post.getUserId()==userId && post.isHas_promo()).count();
+            if(countPosts == 0){
+                throw new NotFoundException("User " + user.get().getUsername() + " has not promo products");
+            }
+            return new CountPromoProductsDto( user.get().getId(), user.get().getUsername(),(int)countPosts);
+        }
+    }
+
+    @Override
+    public PostGetListDto findAllProductsNotPromoByUser(int userId) {
+        Optional<User> user = userRepository.getUserById(userId);
+        if(user.isEmpty()){
+            throw  new NotFoundException("User not found");
+        }
+        if(user.get().getPosts().isEmpty()){
+            throw new NotFoundException("User "+ user.get().getId() +" has not posts");
+        }else{
+            List<Post> posts = user.get().getPosts().stream().filter(post->post.getUserId()==userId && !post.isHas_promo()).toList();
+            if(posts.isEmpty()){
+                throw new NotFoundException("User " + user.get().getUsername() + " has not products without promo");
+            }
+            return new PostGetListDto( user.get().getId(), user.get().getUsername(), parsePostsDto(posts));
+        }
+    }
+
     // Método para convertir una lista Entidad tipo User a una lista Dto tipo SellerDto
     private List<UserListDto> createUserListDto(List<User> users){
         return users.stream()
@@ -161,4 +227,13 @@ public class UserService implements IUserService {
                 .toList();
     }
 
+    private ProductDto parseProductDto(Product product){
+        return new ProductDto(product.getId(),product.getName(),product.getType(),product.getBrand(),product.getColor(),product.getNotes());
+    }
+
+    private List<PostDto> parsePostsDto(List<Post> posts){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd LLLL yyyy");
+        return posts.stream().map(p -> new PostDto(p.getUserId(),p.getId(),p.getDate().format(formatter),parseProductDto(p.getProduct()),p.getCategory(),p.getPrice(),p.isHas_promo(),p.getDiscount()))
+                .toList();
+    }
 }
