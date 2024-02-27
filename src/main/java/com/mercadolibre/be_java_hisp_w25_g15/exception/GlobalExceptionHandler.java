@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -52,6 +53,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
         return ResponseEntity.badRequest().body(errors);
     }
 
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        return ResponseEntity.badRequest().body(new MessageResponseDto(ex.getMessage()));
+    }
+
     //Excepciones de formato de datos, actualmente se lanza cuando se envia una fecha invalida
     @ExceptionHandler(MismatchedInputException.class)
     public ResponseEntity<Object> handleMismatchedInputException(MismatchedInputException ex) {
@@ -68,5 +74,4 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
         String errorMessage = e.getValue()+ " is not a valid value";
         return new ResponseEntity<>(new MessageResponseDto(errorMessage), HttpStatus.BAD_REQUEST);
     }
-
 }

@@ -43,7 +43,6 @@ El      precio máximo puede ser 10.000.000.
         @NotNull(message = "The price cannot be null")
         @DecimalMax(value = "10000000", message = "The price cannot exceed 10,000,000")
         @Positive(message = "The price must be a positive number")
-        @Pattern(regexp = "^\\d*\\.?\\d+$", message = "The double value must be a valid number")
         Double price
 ){
 }
