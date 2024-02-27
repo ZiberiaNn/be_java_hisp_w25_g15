@@ -6,7 +6,7 @@ import com.mercadolibre.be_java_hisp_w25_g15.dto.response.PostGetListDto;
 public interface IPostService {
     PostDto createPost(PostDto postDto);
 
-    PostGetListDto getPostsBySellerIdLastTwoWeeks(int userId, DateOrderEnumDto dateOrder);
+    PostGetListDto getPostsBySellerIdLastTwoWeeks(Integer userId, DateOrderEnumDto dateOrder);
 
 
 }

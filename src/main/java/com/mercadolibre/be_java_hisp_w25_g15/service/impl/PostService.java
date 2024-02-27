@@ -47,7 +47,7 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public PostGetListDto getPostsBySellerIdLastTwoWeeks(int userId, DateOrderEnumDto dateOrder) {
+    public PostGetListDto getPostsBySellerIdLastTwoWeeks(Integer userId, DateOrderEnumDto dateOrder) {
         User user = userRepository.getUserById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id " +userId+ "not found."));
         if(user.getFollowed() == null || user.getFollowed().isEmpty()) {

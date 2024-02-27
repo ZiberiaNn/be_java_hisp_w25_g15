@@ -1,6 +1,5 @@
 package com.mercadolibre.be_java_hisp_w25_g15.model;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,7 +17,7 @@ import java.util.Objects;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 
 public abstract class User {
-    int id;
+    Integer id;
     String username;
     List<User> followed;
 

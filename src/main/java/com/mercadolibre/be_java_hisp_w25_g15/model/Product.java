@@ -15,7 +15,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Product {
     @JsonProperty("product_id")
-    int id;
+    Integer id;
     @JsonProperty("product_name")
     String name;
     String type;

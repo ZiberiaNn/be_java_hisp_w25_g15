@@ -8,6 +8,6 @@ import java.util.Optional;
 public interface IUserRepository {
     void updateFollowedList(User user);
     void updateFollowerList(User user);
-    Optional<User> getUserById(int userId);
+    Optional<User> getUserById(Integer userId);
     List<User> getAllUsers();
 }

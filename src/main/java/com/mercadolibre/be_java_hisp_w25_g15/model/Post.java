@@ -16,17 +16,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Post {
     static final AtomicInteger idGenerator = new AtomicInteger();
     @JsonProperty("post_id")
-    int id;
+    Integer id;
     @JsonProperty("user_id")
-    int userId;
+    Integer userId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     LocalDate date;
     Product product;
-    int category;
-    double price;
-    public Post(int user, LocalDate date, Product product, int category, double price) {
+    Integer category;
+    Double price;
+    public Post(Integer userId, LocalDate date, Product product, Integer category, Double price) {
         this.id = idGenerator.incrementAndGet();
-        this.userId = user;
+        this.userId = userId;
         this.date = date;
         this.product = product;
         this.category = category;

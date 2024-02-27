@@ -40,7 +40,7 @@ public class UserRepository implements IUserRepository {
     }
 
     @Override
-    public Optional<User> getUserById(int userId) {
+    public Optional<User> getUserById(Integer userId) {
         return this.users.stream().filter(user -> user.getId() == userId).findFirst();
     }
 

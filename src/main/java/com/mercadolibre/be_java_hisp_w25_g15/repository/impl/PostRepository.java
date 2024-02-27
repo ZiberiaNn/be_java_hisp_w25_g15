@@ -12,6 +12,8 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 @Repository
 @RequiredArgsConstructor
 @Setter
@@ -31,14 +33,14 @@ public class PostRepository implements IPostRepository {
                             LocalDate.of(2024, 2, 18),
                             new Product(2, "Celular", "Movil", "Apple", "Negro", "Nuevo"),
                             2,
-                            5000
+                            5000.0
                     ),
                     new Post(
                             2,
                             LocalDate.of(2024, 2, 6),
                             new Product(3, "Carro", "Automatico", "Chevrolet", "Azul", "Usado"),
                             3,
-                            50000
+                            50000.0
                     ),
                     new Post(
                             1,
@@ -50,10 +52,10 @@ public class PostRepository implements IPostRepository {
             )
     );
     @Override
-    public List<Post> findAllPostsBySellerIdBetweenDateRange(int sellerId, LocalDate startDate, LocalDate endDate){
+    public List<Post> findAllPostsBySellerIdBetweenDateRange(Integer sellerId, LocalDate startDate, LocalDate endDate){
         return posts.stream()
                 .filter(post ->
-                        post.getUserId() == sellerId
+                        Objects.equals(post.getUserId(), sellerId)
                         && post.getDate().isBefore(endDate)
                         && post.getDate().isAfter(startDate))
                 .toList();

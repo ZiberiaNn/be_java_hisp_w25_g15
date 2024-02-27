@@ -6,9 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface IPostRepository {
-    List<Post> findAllPostsBySellerIdBetweenDateRange(int sellerId, LocalDate startDate, LocalDate endDate);
+    List<Post> findAllPostsBySellerIdBetweenDateRange(Integer sellerId, LocalDate startDate, LocalDate endDate);
     Post addPost(Post post);
-
-
 
 }

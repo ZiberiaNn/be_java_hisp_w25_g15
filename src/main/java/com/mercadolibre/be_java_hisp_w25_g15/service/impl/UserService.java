@@ -1,5 +1,6 @@
 package com.mercadolibre.be_java_hisp_w25_g15.service.impl;
 
+import com.mercadolibre.be_java_hisp_w25_g15.dto.request.FollowDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.request.UnfollowDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.CountFollowersDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.MessageResponseDto;
@@ -11,15 +12,14 @@ import com.mercadolibre.be_java_hisp_w25_g15.model.Seller;
 import com.mercadolibre.be_java_hisp_w25_g15.model.User;
 import com.mercadolibre.be_java_hisp_w25_g15.repository.IUserRepository;
 import com.mercadolibre.be_java_hisp_w25_g15.service.IUserService;
-import com.mercadolibre.be_java_hisp_w25_g15.utils.ObjectMapperBean;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -51,13 +51,13 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public MessageResponseDto followSeller(int userId, int userIdToFollow){
-        if(userId == userIdToFollow)
+    public MessageResponseDto followSeller(FollowDto followDto){
+        if(Objects.equals(followDto.userId(), followDto.userIdToFollow()))
             throw new ConflictException("Users must be different");
-        Optional<User> user = this.userRepository.getUserById(userId);
+        Optional<User> user = this.userRepository.getUserById(followDto.userId());
         if(user.isEmpty())
             throw new NotFoundException("User not found");
-        Optional<User> userToFollow = this.userRepository.getUserById(userIdToFollow);
+        Optional<User> userToFollow = this.userRepository.getUserById(followDto.userIdToFollow());
         if(userToFollow.isEmpty())
             throw new NotFoundException("User to follow not found");
         if(!(userToFollow.get() instanceof Seller))
@@ -65,7 +65,7 @@ public class UserService implements IUserService {
         Optional<User> resultSearchUserInFollowersOfSeller = ((Seller) userToFollow.get())
                 .getFollowers()
                 .stream()
-                .filter((v) -> v.getId() == userId)
+                .filter((v) -> Objects.equals(v.getId(), followDto.userId()))
                 .findFirst();
         if(resultSearchUserInFollowersOfSeller.isPresent())
             throw new ConflictException("User already is following");
@@ -80,7 +80,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public CountFollowersDto countFollowersByUserId(int userId){
+    public CountFollowersDto countFollowersByUserId(Integer userId){
         Optional<User> user = this.userRepository.getUserById(userId);
         if(user.isEmpty())
             throw new NotFoundException("User not found");
@@ -93,7 +93,7 @@ public class UserService implements IUserService {
         );
     }
     @Override
-    public UserDto findAllSellerFollowers(int sellerId, String order){
+    public UserDto findAllSellerFollowers(Integer sellerId, String order){
         Optional<User> optionalUser = this.userRepository.getUserById(sellerId);
 
         if (optionalUser.isEmpty()) {
@@ -113,7 +113,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public UserDto findAllFollowedByUser(int userId, String order) {
+    public UserDto findAllFollowedByUser(Integer userId, String order) {
         Optional<User> user = userRepository.getUserById(userId);
         // Se valida si el usuario existe
         if(user.isEmpty()){

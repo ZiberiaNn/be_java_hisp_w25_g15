@@ -25,7 +25,7 @@ public class PostController {
     }
     @GetMapping("/followed/{userId}/list")
     ResponseEntity<PostGetListDto> getPostsBySellerIdLastTwoWeeks(
-            @PathVariable(name = "userId") int userId,
+            @PathVariable(name = "userId") Integer userId,
             @RequestParam(name = "order", required = false) DateOrderEnumDto order
             ){
         return new ResponseEntity<>(iPostService.getPostsBySellerIdLastTwoWeeks(userId, order), HttpStatus.OK);
