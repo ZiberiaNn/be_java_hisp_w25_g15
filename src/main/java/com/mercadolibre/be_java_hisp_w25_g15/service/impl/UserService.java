@@ -8,6 +8,7 @@ import com.mercadolibre.be_java_hisp_w25_g15.dto.response.UserDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.UserListDto;
 import com.mercadolibre.be_java_hisp_w25_g15.exception.ConflictException;
 import com.mercadolibre.be_java_hisp_w25_g15.exception.NotFoundException;
+import com.mercadolibre.be_java_hisp_w25_g15.exception.OrderNotValidException;
 import com.mercadolibre.be_java_hisp_w25_g15.model.Seller;
 import com.mercadolibre.be_java_hisp_w25_g15.model.User;
 import com.mercadolibre.be_java_hisp_w25_g15.repository.IUserRepository;
@@ -94,12 +95,15 @@ public class UserService implements IUserService {
     }
     @Override
     public UserDto findAllSellerFollowers(Integer sellerId, String order){
+
+        if(!orderIsValid(order)){
+            throw new OrderNotValidException("The given order filter is not valid");
+        }
         Optional<User> optionalUser = this.userRepository.getUserById(sellerId);
 
         if (optionalUser.isEmpty()) {
             throw new NotFoundException("Seller not found");
         }
-
         User user = optionalUser.get();
 
         if (!(user instanceof Seller)) {
@@ -114,6 +118,11 @@ public class UserService implements IUserService {
 
     @Override
     public UserDto findAllFollowedByUser(Integer userId, String order) {
+
+        if (!orderIsValid(order)){
+            throw new OrderNotValidException("The given order filter is not valid");
+        }
+
         Optional<User> user = userRepository.getUserById(userId);
         // Se valida si el usuario existe
         if(user.isEmpty()){
@@ -130,7 +139,7 @@ public class UserService implements IUserService {
     @Override
     public List<UserListDto> findAll() {
         if(userRepository.getAllUsers().isEmpty()){
-            throw new NotFoundException("Usuarios no registrados");
+            throw new NotFoundException("User list is empty");
         }
        return parseUsersDto(userRepository.getAllUsers());
     }
@@ -153,6 +162,10 @@ public class UserService implements IUserService {
             }
         }
         return userListDtos;
+    }
+
+    private boolean orderIsValid(String order){
+       return (order.equals("name_asc")||order.equals("name_desc"));
     }
 
     // Método para convertir una lista Entidad tipo User a una lista Dto tipo UserDto

@@ -5,7 +5,9 @@ import com.mercadolibre.be_java_hisp_w25_g15.dto.request.UnfollowDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.CountFollowersDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.MessageResponseDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.UserDto;
+import com.mercadolibre.be_java_hisp_w25_g15.dto.response.UserListDto;
 import com.mercadolibre.be_java_hisp_w25_g15.exception.NotFoundException;
+import com.mercadolibre.be_java_hisp_w25_g15.exception.OrderNotValidException;
 import com.mercadolibre.be_java_hisp_w25_g15.model.Buyer;
 import com.mercadolibre.be_java_hisp_w25_g15.model.Seller;
 import com.mercadolibre.be_java_hisp_w25_g15.model.User;
@@ -19,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.util.Assert;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -42,14 +45,29 @@ public class UserServiceTest {
      Optional<User> sellerWithFollower;
      Optional<User> buyer;
 
+    Optional<User> sellerWithManyFollowers;
+    Optional<User> buyerWithFollowed1;
+    Optional<User> buyerWithFollowed2;
+
     @BeforeEach
     void setUp(){
-        buyer =  Optional.of(Buyer.builder().id(1).username("Luca").followed(new ArrayList<>()).build());
-        seller = Optional.of(Seller.builder().id(2).username("Vendedor1").followed(new ArrayList<>()).followers(new ArrayList<>()).build());
-        sellerWithFollower = Optional.of(Seller.builder().id(3).username("Vendedor con seguidores").followed(new ArrayList<>()).followers(new ArrayList<>(
+        buyer =  Optional.of(Buyer.builder().id(1).username("Buyer1").followed(new ArrayList<>()).build());
+        seller = Optional.of(Seller.builder().id(2).username("Seller1").followed(new ArrayList<>()).followers(new ArrayList<>()).build());
+        sellerWithFollower = Optional.of(Seller.builder().id(3).username("Seller with followers").followed(new ArrayList<>()).followers(new ArrayList<>(
                 List.of(buyer.get())
         )).build());
         buyer.get().getFollowed().add(sellerWithFollower.get());
+
+        buyerWithFollowed1 = Optional.of(Buyer.builder().id(4).username("Yanina").followed(new ArrayList<>()).build());
+        buyerWithFollowed2 = Optional.of(Buyer.builder().id(5).username("Angel").followed(new ArrayList<>()).build());
+        sellerWithManyFollowers = Optional.of(Seller.builder().id(6).username("Seller with many followers").followed(new ArrayList<>()).followers(new ArrayList<>(
+                List.of(
+                        buyerWithFollowed1.get(),
+                        buyerWithFollowed2.get()
+                )
+        )).build());
+        buyerWithFollowed1.get().getFollowed().add(sellerWithManyFollowers.get());
+        buyerWithFollowed2.get().getFollowed().add(sellerWithManyFollowers.get());
     }
 
 
@@ -123,7 +141,7 @@ public class UserServiceTest {
     void countFollowersByUserId() {
         //Arrange
         Integer sellerId = 3;
-        String sellerName = "Vendedor con seguidores";
+        String sellerName = "Seller with followers";
         Integer countExpected = 1;
         CountFollowersDto countFollowersDtoExpected = new CountFollowersDto(sellerId, sellerName, countExpected);
         when(userRepository.getUserById(3)).thenReturn(sellerWithFollower);
@@ -135,11 +153,48 @@ public class UserServiceTest {
     }
 
     @Test
-    void findAllSellerFollowers() {
+    void findAllSellerFollowersWithOrderOK() {
+        //Arrange
+        Integer sellerId = 6;
+        String order = "name_asc";
+        UserDto expected = new UserDto(sellerId, sellerWithManyFollowers.get().getUsername(),
+                List.of(
+                        new UserListDto(buyerWithFollowed2.get().getId(), buyerWithFollowed2.get().getUsername()),
+                        new UserListDto(buyerWithFollowed1.get().getId(), buyerWithFollowed1.get().getUsername())
+                ),
+                null
+                );
+        when(userRepository.getUserById(sellerId)).thenReturn(sellerWithManyFollowers);
+        //Act
+        UserDto result = userService.findAllSellerFollowers(sellerId, order);
+        //Assert
+        Assertions.assertEquals(expected, result);
     }
 
     @Test
-    void findAllFollowedByUser() {
+    void findAllSellerFollowersWithOrderingNotFoundTypeOrder() {
+        //Arrange
+        Integer sellerId = 6;
+        String differentOrder = "lastname_asc";
+        //Act & Assert
+        Assertions.assertThrows(OrderNotValidException.class,
+                () -> userService.findAllSellerFollowers(sellerId, differentOrder));
+    }
+
+    @Test
+    void findAllFollowedByUserWithOrderOk() {
+        //Arrange
+
+        //Act
+
+        //Assert
+    }
+
+    @Test
+    void findAllFollowedByUserWithOrderingNotFoundTypeOrd() {
+        //Arrange
+
+        //Act & Assert
     }
 
     @Test

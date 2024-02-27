@@ -74,4 +74,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
         String errorMessage = e.getValue()+ " is not a valid value";
         return new ResponseEntity<>(new MessageResponseDto(errorMessage), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(OrderNotValidException.class)
+    public ResponseEntity<MessageResponseDto> orderNotValidException(Exception e){
+        return new ResponseEntity<>(new MessageResponseDto(e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
 }
