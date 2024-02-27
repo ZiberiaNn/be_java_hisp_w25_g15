@@ -3,10 +3,7 @@ package com.mercadolibre.be_java_hisp_w25_g15.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -27,6 +24,7 @@ public record PostDto (
         Que el campo no esté vacío.
          */
         @NotNull(message = "The date cannot be null")
+        @NotBlank(message = "The product_name cannot be empty")
         @Pattern(regexp = "^(0[1-9]|[1-2][0-9]|3[0-1])-(0[1-9]|1[0-2])-(19|20)\\d{2}|\\d{4}$", message = "The date format must be dd-MM-yyyy")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
         String date,
@@ -45,6 +43,7 @@ El      precio máximo puede ser 10.000.000.
         @NotNull(message = "The price cannot be null")
         @DecimalMax(value = "10000000", message = "The price cannot exceed 10,000,000")
         @Positive(message = "The price must be a positive number")
+        @Pattern(regexp = "^\\d*\\.?\\d+$", message = "The double value must be a valid number")
         Double price
 ){
 }
