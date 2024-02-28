@@ -85,7 +85,6 @@ class PostServiceTest {
         when(mapperService.getMapper()).thenReturn(mapper);
         when(userRepository.getUserById(1)).thenReturn(Optional.of(user));
         when(postRepository.addPost(post1)).thenReturn(post1);
-        when(mapperService.getMapper()).thenReturn(mapper);
         // Act
         PostDto post = postService.createPost(postDto1);
         // Assertions

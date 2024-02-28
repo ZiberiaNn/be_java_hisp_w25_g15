@@ -94,8 +94,8 @@ public class UserServiceTest {
     @Test
     void unfollowSellerOK() {
         //Arrange
-        Integer userId = 1;
-        Integer userIdToUnfollow = 3;
+        Integer userId = buyer.get().getId();
+        Integer userIdToUnfollow = sellerWithFollower.get().getId();
         UnfollowDto unfollowDtoParam = new UnfollowDto(userId, userIdToUnfollow);
         MessageResponseDto messageResponseDtoExpected = new MessageResponseDto("User unfollowed successfully");
         when(userRepository.getUserById(userId)).thenReturn(buyer);
@@ -107,8 +107,8 @@ public class UserServiceTest {
         //Assert
         assertEquals(0, buyer.get().getFollowed().size());
         assertEquals(messageResponseDtoExpected.message(), messageResponseDto.message());
-        verify(userRepository).updateFollowerList(seller.get());
-        verify(userRepository).updateFollowedList(buyer.get());
+        verify(userRepository).removeFollower((Seller) sellerWithFollower.get(), buyer.get());
+        verify(userRepository).removeFollowed(buyer.get(),(Seller) sellerWithFollower.get());
     }
     //T-0002 NO CUMPLE
     @Test
@@ -140,8 +140,8 @@ public class UserServiceTest {
 
         //Assert
         assertEquals(messageResponseDtoExpected.message(), messageResponseDto.message());
-        verify(userRepository).updateFollowerList(seller.get());
-        verify(userRepository).updateFollowedList(buyer.get());
+        verify(userRepository).addFollower((Seller) seller.get(), buyer.get());
+        verify(userRepository).addFollowed(buyer.get(), (Seller) seller.get());
     }
     //T-0001 NO CUMPLE
     @Test
