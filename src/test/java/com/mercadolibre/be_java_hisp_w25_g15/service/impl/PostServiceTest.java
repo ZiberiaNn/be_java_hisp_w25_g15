@@ -80,12 +80,12 @@ class PostServiceTest {
     @Test
     void createPost(){
         // Arrange
-        User user = new Seller(null);
-        //when(mapperService.getMapper()).thenReturn(mapper.getMapper());
-        when(mapperService.getMapper().convertValue(postDto1, Post.class)).thenReturn(post1);
+        User user = new Seller();
+        user.setId(1);
+        when(mapperService.getMapper()).thenReturn(mapper);
         when(userRepository.getUserById(1)).thenReturn(Optional.of(user));
         when(postRepository.addPost(post1)).thenReturn(post1);
-        when(mapperService.getMapper().convertValue(post1, PostDto.class)).thenReturn(postDto1);
+        when(mapperService.getMapper()).thenReturn(mapper);
         // Act
         PostDto post = postService.createPost(postDto1);
         // Assertions
