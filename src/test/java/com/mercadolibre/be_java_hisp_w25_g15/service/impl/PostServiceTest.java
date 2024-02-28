@@ -93,42 +93,26 @@ class PostServiceTest {
     }
     @Test
     void createPostNotSeller() {
-        Optional<User> buyer = Optional.of(Buyer.builder().id(1).username("Buyer").followed(new ArrayList<>()).build());
-
-        PostDto post = new PostDto(1, 2, "20-02-2024", new ProductDto(
-                1,
-                "Mesa",
-                "Hogar",
-                "Casa",
-                "Negro",
-                "Mesa alta"
-
-        ), 1, 20000.0);
-
-        when(userRepository.getUserById(1)).thenReturn(buyer);
-
-        //Act & Assert
-        Assertions.assertThrows(ConflictException.class, () -> postService.createPost(post));
+        // Arrange
+        User user = new Buyer();
+        user.setId(1);
+        when(mapperService.getMapper()).thenReturn(mapper);
+        when(userRepository.getUserById(1)).thenReturn(Optional.of(user));
+        when(userRepository.getUserById(postDto1.user_id())).thenReturn(Optional.of(new Buyer()));
+        // Act & Assert
+        Assertions.assertThrows(ConflictException.class, () -> postService.createPost(postDto1));
     }
 
     @Test
     void createPostNotUserFound(){
-        //Arrange
-        Optional<User> sellerEmpty = Optional.empty();
-
-        PostDto post = new PostDto(200, 2, "20-02-2024", new ProductDto(
-                1,
-                "Mesa",
-                "Hogar",
-                "Casa",
-                "Negro",
-                "Mesa alta"
-
-        ), 1, 20000.0);
-
-        when(userRepository.getUserById(200)).thenReturn(sellerEmpty);
-        //Act & Assert
-        Assertions.assertThrows(NotFoundException.class, () -> postService.createPost(post));
+        // Arrange
+        User user = new Seller();
+        user.setId(1);
+        when(mapperService.getMapper()).thenReturn(mapper);
+        when(userRepository.getUserById(1)).thenReturn(Optional.of(user));
+        when(userRepository.getUserById(postDto1.user_id())).thenReturn(Optional.empty());
+        // Act & Assert
+        Assertions.assertThrows(NotFoundException.class, () -> postService.createPost(postDto1));
     }
 
     @Test
