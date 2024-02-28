@@ -144,14 +144,29 @@ class PostServiceTest {
         ));
 
         Mockito.when(userRepository.getUserById(user.getId())).thenReturn(Optional.of(user));
-        //Mockito.when(userRepository.getUserById(seller.getId())).thenReturn(Optional.of(seller));
         Mockito.when(mapperService.getMapper()).thenReturn(mapper);
         Mockito.when(postRepository.findAllPostsBySellerIdBetweenDateRange(anyInt(),any(),any())).thenReturn(postList);
         PostGetListDto actual = postService.getPostsByUserFollowedInLastTwoWeeks(user.getId(), order);
         Assertions.assertEquals(expected, actual);
     }
+    @Test
+    void getPostsByUserFollowedInLastTwoWeeksAscOK() {
+        DateOrderEnumDto order = DateOrderEnumDto.DATE_ASC;
+        Seller seller = Seller.builder().id(1).username("Seller with followers").followed(new ArrayList<>()).followers(new ArrayList<>()).build();
+        User user = Buyer.builder().id(4).username("Yanina").followed(new ArrayList<>(List.of(seller))).build();
+        seller.getFollowers().add(user);
+        PostGetListDto expected = new PostGetListDto(user.getId(), List.of(
+                new PostDto(seller.getId(),3,"01-01-2024", productDto1, 1,250.0),
+        new PostDto(seller.getId(),1,"15-02-2024", productDto1, 1,15.0),
+        new PostDto(seller.getId(),2,"17-02-2024", productDto2, 2,100.0)
+        ));
 
-
+        Mockito.when(userRepository.getUserById(user.getId())).thenReturn(Optional.of(user));
+        Mockito.when(mapperService.getMapper()).thenReturn(mapper);
+        Mockito.when(postRepository.findAllPostsBySellerIdBetweenDateRange(anyInt(),any(),any())).thenReturn(postList);
+        PostGetListDto actual = postService.getPostsByUserFollowedInLastTwoWeeks(user.getId(), order);
+        Assertions.assertEquals(expected, actual);
+    }
     //T-0005 Verificar que el tipo de ordenamiento por fecha exista (US-0009)
     @Test
     void findPostsBySellerIdLastTwoWeeksWithOrderingNotFoundTypeOrder() {
