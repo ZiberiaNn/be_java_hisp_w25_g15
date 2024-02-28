@@ -100,12 +100,13 @@ public class UserServiceTest {
         MessageResponseDto messageResponseDtoExpected = new MessageResponseDto("User unfollowed successfully");
         when(userRepository.getUserById(userId)).thenReturn(buyer);
         when(userRepository.getUserById(userIdToUnfollow)).thenReturn(sellerWithFollower);
+        when(userRepository.removeFollower((Seller) sellerWithFollower.get(), buyer.get())).thenReturn(true);
+        when(userRepository.removeFollowed(buyer.get(),(Seller) sellerWithFollower.get())).thenReturn(true);
 
         //Act
         MessageResponseDto messageResponseDto = this.userService.unfollowSeller(unfollowDtoParam);
 
         //Assert
-        assertEquals(0, buyer.get().getFollowed().size());
         assertEquals(messageResponseDtoExpected.message(), messageResponseDto.message());
         verify(userRepository).removeFollower((Seller) sellerWithFollower.get(), buyer.get());
         verify(userRepository).removeFollowed(buyer.get(),(Seller) sellerWithFollower.get());
