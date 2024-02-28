@@ -1,6 +1,7 @@
 package com.mercadolibre.be_java_hisp_w25_g15.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.PostDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.ProductDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.request.DateOrderEnumDto;
@@ -13,6 +14,7 @@ import com.mercadolibre.be_java_hisp_w25_g15.repository.impl.PostRepository;
 import com.mercadolibre.be_java_hisp_w25_g15.repository.impl.UserRepository;
 import com.mercadolibre.be_java_hisp_w25_g15.utils.ObjectMapperBean;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,9 +22,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,12 +31,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class PostServiceTest {
-
-    @Autowired
-    ObjectMapperBean mapper;
     @Mock
     PostRepository postRepository;
     @Mock
@@ -60,6 +55,12 @@ class PostServiceTest {
     PostGetListDto postGetListDto;
     List<PostDto> postDtoList;
     List<Post> postList;
+    static ObjectMapper mapper = new ObjectMapper();
+    @BeforeAll
+    static void init(){
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        mapper.registerModule(javaTimeModule);
+    }
     @BeforeEach
     void setUp() {
         productDto1 = new ProductDto(1, "Leche","Lacteo", "Milkaut", "Blanco", "");
@@ -70,17 +71,17 @@ class PostServiceTest {
         postDtoList = new ArrayList<>(List.of(postDto1,postDto2,postDto3));
         postGetListDto = new PostGetListDto(1, postDtoList);
 
-        postList = postDtoList.stream().map(postDto -> mapper.getMapper().convertValue(postDto, Post.class)).toList();
-        post1 = mapper.getMapper().convertValue(postDto1, Post.class);
-        post2 = mapper.getMapper().convertValue(postDto2, Post.class);
-        post3 = mapper.getMapper().convertValue(postDto3, Post.class);
+        postList = postDtoList.stream().map(postDto -> mapper.convertValue(postDto, Post.class)).toList();
+        post1 = mapper.convertValue(postDto1, Post.class);
+        post2 = mapper.convertValue(postDto2, Post.class);
+        post3 = mapper.convertValue(postDto3, Post.class);
     }
 
     @Test
     void createPost(){
         // Arrange
         User user = new Seller(null);
-        when(mapperService.getMapper()).thenReturn(mapper.getMapper());
+        //when(mapperService.getMapper()).thenReturn(mapper.getMapper());
         when(mapperService.getMapper().convertValue(postDto1, Post.class)).thenReturn(post1);
         when(userRepository.getUserById(1)).thenReturn(Optional.of(user));
         when(postRepository.addPost(post1)).thenReturn(post1);
@@ -143,8 +144,8 @@ class PostServiceTest {
         ));
 
         Mockito.when(userRepository.getUserById(user.getId())).thenReturn(Optional.of(user));
-        Mockito.when(userRepository.getUserById(seller.getId())).thenReturn(Optional.of(seller));
-
+        //Mockito.when(userRepository.getUserById(seller.getId())).thenReturn(Optional.of(seller));
+        Mockito.when(mapperService.getMapper()).thenReturn(mapper);
         Mockito.when(postRepository.findAllPostsBySellerIdBetweenDateRange(anyInt(),any(),any())).thenReturn(postList);
         PostGetListDto actual = postService.getPostsByUserFollowedInLastTwoWeeks(user.getId(), order);
         Assertions.assertEquals(expected, actual);
