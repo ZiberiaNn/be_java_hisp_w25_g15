@@ -5,6 +5,7 @@ import com.mercadolibre.be_java_hisp_w25_g15.dto.request.DateOrderEnumDto;
 import com.mercadolibre.be_java_hisp_w25_g15.dto.response.PostGetListDto;
 import com.mercadolibre.be_java_hisp_w25_g15.exception.ConflictException;
 import com.mercadolibre.be_java_hisp_w25_g15.exception.NotFoundException;
+import com.mercadolibre.be_java_hisp_w25_g15.exception.OrderNotValidException;
 import com.mercadolibre.be_java_hisp_w25_g15.model.Post;
 import com.mercadolibre.be_java_hisp_w25_g15.model.Seller;
 import com.mercadolibre.be_java_hisp_w25_g15.model.User;
@@ -44,12 +45,25 @@ public class PostService implements IPostService {
         } else {
             throw new NotFoundException("User not found");
         }
+
+
+        /* PROPUESTA DIFERENTE
+        * if(user.isEmpty())
+        *   throw new NotFoundException("User not found");
+        * if(!(user.get() instance Seller))
+        *   throw new ConflictException("User must be a seller to create a post");
+        * Post post = mapper.getMapper().convertValue(postDto, Post.class);
+        * post.setUserId(user.get().getId());
+        * Post newPost = postRepository.addPost(post);
+        * return mapper.getMapper().convertValue(newPost, PostDto.class);
+        * */
     }
 
     @Override
-    public PostGetListDto getPostsBySellerIdLastTwoWeeks(Integer userId, DateOrderEnumDto dateOrder) {
+    public PostGetListDto getPostsByUserFollowedInLastTwoWeeks(Integer userId, DateOrderEnumDto dateOrder) {
+        if(dateOrder == null) throw new OrderNotValidException("The given order filter is not valid");
         User user = userRepository.getUserById(userId)
-                .orElseThrow(() -> new NotFoundException("User with id " +userId+ "not found."));
+                .orElseThrow(() -> new NotFoundException("User with id " +userId+ " not found."));
         if(user.getFollowed() == null || user.getFollowed().isEmpty()) {
             throw new NotFoundException("The user with id "+userId+" has no followed users");
         }
@@ -70,7 +84,6 @@ public class PostService implements IPostService {
         );
     }
     private static void sortPostDtoListByDate(DateOrderEnumDto dateOrder, List<PostDto> postDtoList) {
-        if(dateOrder == null) return;
         Comparator<String> order = Comparator.reverseOrder();
         if(dateOrder == DateOrderEnumDto.DATE_ASC) {
             order = Comparator.naturalOrder();

@@ -46,8 +46,11 @@ public class UserServiceTest {
      Optional<User> buyer;
 
     Optional<User> sellerWithManyFollowers;
+    Optional<User> sellerWithManyFollowers2;
     Optional<User> buyerWithFollowed1;
     Optional<User> buyerWithFollowed2;
+
+    List<User> userList;
 
     @BeforeEach
     void setUp(){
@@ -66,11 +69,28 @@ public class UserServiceTest {
                         buyerWithFollowed2.get()
                 )
         )).build());
+        sellerWithManyFollowers2 = Optional.of(Seller.builder().id(7).username("Augusto").followed(new ArrayList<>()).followers(new ArrayList<>(
+                List.of(
+                        buyerWithFollowed1.get(),
+                        buyerWithFollowed2.get()
+                )
+        )).build());
         buyerWithFollowed1.get().getFollowed().add(sellerWithManyFollowers.get());
+        buyerWithFollowed1.get().getFollowed().add(sellerWithManyFollowers2.get());
         buyerWithFollowed2.get().getFollowed().add(sellerWithManyFollowers.get());
+        buyerWithFollowed2.get().getFollowed().add(sellerWithManyFollowers2.get());
+        userList = List.of(
+                buyer.get(),
+                seller.get(),
+                sellerWithFollower.get(),
+                sellerWithManyFollowers.get(),
+                sellerWithManyFollowers2.get(),
+                buyerWithFollowed1.get(),
+                buyerWithFollowed2.get()
+        );
     }
 
-
+    //T-0002 CUMPLE
     @Test
     void unfollowSellerOK() {
         //Arrange
@@ -90,7 +110,7 @@ public class UserServiceTest {
         verify(userRepository).updateFollowerList(seller.get());
         verify(userRepository).updateFollowedList(buyer.get());
     }
-
+    //T-0002 NO CUMPLE
     @Test
     void unfollowNotExistingSellerOK() {
         //Arrange
@@ -104,7 +124,7 @@ public class UserServiceTest {
         Assertions.assertThrows(NotFoundException.class,
                 () -> userService.unfollowSeller(unfollowDto));
     }
-
+    //T-0001 CUMPLE
     @Test
     void followSellerOK() {
         //Arrange
@@ -123,6 +143,7 @@ public class UserServiceTest {
         verify(userRepository).updateFollowerList(seller.get());
         verify(userRepository).updateFollowedList(buyer.get());
     }
+    //T-0001 NO CUMPLE
     @Test
     void followNotExistingSeller(){
         //Arrange
@@ -136,7 +157,7 @@ public class UserServiceTest {
         Assertions.assertThrows(NotFoundException.class,
                 () -> userService.followSeller(followDto));
     }
-
+    //T-0007
     @Test
     void countFollowersByUserId() {
         //Arrange
@@ -151,12 +172,13 @@ public class UserServiceTest {
         //Assert
         Assertions.assertEquals(countFollowersDtoExpected, countFollowersDtoResponse);
     }
-
+    //T-0003 CUMPLE
     @Test
-    void findAllSellerFollowersWithOrderOK() {
+        void findAllSellerFollowersWithOrderAscOK() {
         //Arrange
         Integer sellerId = 6;
         String order = "name_asc";
+
         UserDto expected = new UserDto(sellerId, sellerWithManyFollowers.get().getUsername(),
                 List.of(
                         new UserListDto(buyerWithFollowed2.get().getId(), buyerWithFollowed2.get().getUsername()),
@@ -170,7 +192,28 @@ public class UserServiceTest {
         //Assert
         Assertions.assertEquals(expected, result);
     }
+    //T-0004 FOLLOWERS DESC
+    @Test
+    void findAllSellerFollowersWithOrderDescOK() {
+        //Arrange
+        Integer sellerId = 6;
+        String order = "name_desc";
 
+        UserDto expected = new UserDto(sellerId, sellerWithManyFollowers.get().getUsername(),
+                List.of(
+                        new UserListDto(buyerWithFollowed1.get().getId(), buyerWithFollowed1.get().getUsername()),
+                        new UserListDto(buyerWithFollowed2.get().getId(), buyerWithFollowed2.get().getUsername())
+                ),
+                null
+        );
+        when(userRepository.getUserById(sellerId)).thenReturn(sellerWithManyFollowers);
+        //Act
+        UserDto result = userService.findAllSellerFollowers(sellerId, order);
+        //Assert
+        Assertions.assertEquals(expected, result);
+    }
+
+    //T-0003 NO CUMPLE
     @Test
     void findAllSellerFollowersWithOrderingNotFoundTypeOrder() {
         //Arrange
@@ -180,24 +223,88 @@ public class UserServiceTest {
         Assertions.assertThrows(OrderNotValidException.class,
                 () -> userService.findAllSellerFollowers(sellerId, differentOrder));
     }
-
-    @Test
-    void findAllFollowedByUserWithOrderOk() {
-        //Arrange
-
-        //Act
-
-        //Assert
-    }
-
+    //T-0003 NO CUMPLE
     @Test
     void findAllFollowedByUserWithOrderingNotFoundTypeOrd() {
         //Arrange
+        Integer buyerId = 4;
+        String differentOrder = "lastname_asc";
 
         //Act & Assert
+        Assertions.assertThrows(OrderNotValidException.class,
+                () -> userService.findAllFollowedByUser(buyerId, differentOrder));
+    }
+    //T-0004 FOLLOWED DESC
+    @Test
+    void findAllFollowedByUserWithOrderDescOk() {
+        //Arrange
+        Integer buyerId = 4;
+        String order = "name_desc";
+        UserDto expected = new UserDto(buyerId, buyerWithFollowed1.get().getUsername(),
+                null,
+                List.of(
+                        new UserListDto(sellerWithManyFollowers.get().getId(), sellerWithManyFollowers.get().getUsername()),
+                        new UserListDto(sellerWithManyFollowers2.get().getId(), sellerWithManyFollowers2.get().getUsername())
+                )
+        );
+        when(userRepository.getUserById(buyerId)).thenReturn(buyerWithFollowed1);
+        //Act
+        UserDto result = userService.findAllFollowedByUser(buyerId, order);
+
+        //Assert
+        Assertions.assertEquals(expected, result);
+    }
+
+    //T-0004 FOLLOWED ASC
+    @Test
+    void findAllFollowedByUserWithOrderAscOk() {
+        //Arrange
+        Integer buyerId = 4;
+        String order = "name_asc";
+        UserDto expected = new UserDto(buyerId, buyerWithFollowed1.get().getUsername(),
+                null,
+                List.of(
+                        new UserListDto(sellerWithManyFollowers2.get().getId(), sellerWithManyFollowers2.get().getUsername()),
+                        new UserListDto(sellerWithManyFollowers.get().getId(), sellerWithManyFollowers.get().getUsername())
+
+                )
+        );
+        when(userRepository.getUserById(buyerId)).thenReturn(buyerWithFollowed1);
+        //Act
+        UserDto result = userService.findAllFollowedByUser(buyerId, order);
+
+        //Assert
+        Assertions.assertEquals(expected, result);
+    }
+
+
+    //*T005 Adicional NO CUMPLE :D
+    @Test
+    void findAllEmpty() {
+        // Act & Assert
+        Assertions.assertThrows(NotFoundException.class,
+                () -> userService.findAll());
     }
 
     @Test
     void findAll() {
+        // arrange
+        List<UserListDto> userListDtosExpected = List.of(
+                new UserListDto(buyer.get().getId(), buyer.get().getUsername()),
+                new UserListDto(seller.get().getId(), seller.get().getUsername()),
+                new UserListDto(sellerWithFollower.get().getId(), sellerWithFollower.get().getUsername()),
+                new UserListDto(sellerWithManyFollowers.get().getId(), sellerWithManyFollowers.get().getUsername()),
+                new UserListDto(sellerWithManyFollowers2.get().getId(), sellerWithManyFollowers2.get().getUsername()),
+                new UserListDto(buyerWithFollowed1.get().getId(), buyerWithFollowed1.get().getUsername()),
+                new UserListDto(buyerWithFollowed2.get().getId(), buyerWithFollowed2.get().getUsername())
+        );
+
+        // act
+        when(userRepository.getAllUsers()).thenReturn(userList);
+        List<UserListDto> userListDtosResult = this.userService.findAll();
+
+        // assert
+        assertEquals(userListDtosExpected, userListDtosResult);
+
     }
 }

@@ -9,5 +9,5 @@ public interface IUserRepository {
     void updateFollowedList(User user);
     void updateFollowerList(User user);
     Optional<User> getUserById(Integer userId);
-    List<User> getAllUsers();
+    List<User>getAllUsers();
 }

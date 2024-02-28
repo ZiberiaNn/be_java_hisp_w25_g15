@@ -28,7 +28,7 @@ public class PostController {
             @PathVariable(name = "userId") Integer userId,
             @RequestParam(name = "order", required = false) DateOrderEnumDto order
             ){
-        return new ResponseEntity<>(iPostService.getPostsBySellerIdLastTwoWeeks(userId, order), HttpStatus.OK);
+        return new ResponseEntity<>(iPostService.getPostsByUserFollowedInLastTwoWeeks(userId, order), HttpStatus.OK);
     }
 
 }

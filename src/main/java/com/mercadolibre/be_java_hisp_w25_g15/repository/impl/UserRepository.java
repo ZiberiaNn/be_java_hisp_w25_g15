@@ -46,6 +46,7 @@ public class UserRepository implements IUserRepository {
 
     @Override
     public List<User> getAllUsers() {
+
         return this.users;
     }
 }

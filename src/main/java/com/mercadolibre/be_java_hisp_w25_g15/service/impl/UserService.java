@@ -138,10 +138,11 @@ public class UserService implements IUserService {
 
     @Override
     public List<UserListDto> findAll() {
-        if(userRepository.getAllUsers().isEmpty()){
+        List<User> userList = userRepository.getAllUsers();
+        if(userList.isEmpty()){
             throw new NotFoundException("User list is empty");
         }
-       return parseUsersDto(userRepository.getAllUsers());
+       return parseUsersDto(userList);
     }
 
     // Método para convertir una lista Entidad tipo User a una lista Dto tipo SellerDto
