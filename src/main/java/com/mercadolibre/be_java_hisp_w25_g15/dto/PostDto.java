@@ -11,7 +11,6 @@ import java.time.LocalDate;
 
 public record PostDto (
 
-
         /*
         Que el campo no esté vacío.
         Mayor 0
@@ -28,7 +27,7 @@ public record PostDto (
         @Pattern(regexp = "^(0[1-9]|[1-2][0-9]|3[0-1])-(0[1-9]|1[0-2])-(19|20)\\d{2}|\\d{4}$", message = "The date format must be dd-MM-yyyy")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
         String date,
-        @Valid @NotNull(message = "The product cannot be null")
+        @Valid @NotNull(message = "Post must be products associated")
         ProductDto product,
         /*
         Que el campo no esté vacío.
